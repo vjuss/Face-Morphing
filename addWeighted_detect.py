@@ -39,32 +39,32 @@ while True:
     faces2= detector(gray2)
     faces3 = detector(blendedgray)
     
-    for face in faces:
-        x1 = face.left()
-        y1 = face.top()
-        x2 = face.right()
-        y2 = face.bottom()
-        #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-        landmarks = predictor(gray,face)
+    # for face in faces:
+    #     x1 = face.left()
+    #     y1 = face.top()
+    #     x2 = face.right()
+    #     y2 = face.bottom()
+    #     #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+    #     landmarks = predictor(gray,face)
 
-        for n in range(0, 68):
-                x = landmarks.part(n).x
-                y = landmarks.part(n).y
-                cv2.circle(blended, (x, y), 6, (0, 255, 0), -1)
+    #     for n in range(0, 68):
+    #             x = landmarks.part(n).x
+    #             y = landmarks.part(n).y
+    #             cv2.circle(blended, (x, y), 6, (0, 255, 0), -1)
 
 
-    for face2 in faces2:
-        x1 = face2.left()
-        y1 = face2.top()
-        x2 = face2.right()
-        y2 = face2.bottom()
-        #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-        landmarks2 = predictor(gray2,face2)
+    # for face2 in faces2:
+    #     x1 = face2.left()
+    #     y1 = face2.top()
+    #     x2 = face2.right()
+    #     y2 = face2.bottom()
+    #     #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+    #     landmarks2 = predictor(gray2,face2)
 
-        for n in range(0, 68):
-                x = landmarks2.part(n).x
-                y = landmarks2.part(n).y
-                cv2.circle(blended, (x, y), 6, (255, 0, 0), -1)
+    #     for n in range(0, 68):
+    #             x = landmarks2.part(n).x
+    #             y = landmarks2.part(n).y
+    #             cv2.circle(blended, (x, y), 6, (255, 0, 0), -1)
 
 
     for face3 in faces3:
