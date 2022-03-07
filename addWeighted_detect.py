@@ -50,7 +50,7 @@ while True:
         for n in range(0, 68):
                 x = landmarks.part(n).x
                 y = landmarks.part(n).y
-                cv2.circle(frame, (x, y), 6, (0, 255, 0), -1)
+                cv2.circle(blended, (x, y), 6, (0, 255, 0), -1)
 
 
     for face2 in faces2:
@@ -64,7 +64,7 @@ while True:
         for n in range(0, 68):
                 x = landmarks2.part(n).x
                 y = landmarks2.part(n).y
-                cv2.circle(frame, (x, y), 6, (255, 0, 0), -1)
+                cv2.circle(blended, (x, y), 6, (255, 0, 0), -1)
 
 
     for face3 in faces3:
@@ -78,10 +78,10 @@ while True:
         for n in range(0, 68):
                 x = landmarks3.part(n).x
                 y = landmarks3.part(n).y
-                cv2.circle(frame, (x, y), 6, (0, 0, 255), -1) #drawing ghost faces from the blended frame that is not visible
+                cv2.circle(blended, (x, y), 6, (0, 0, 255), -1) #drawing ghost faces from the blended frame that is not visible
 
-    cv2.imshow("Frame", frame) #show the other video feed only
     #cv2.imshow("Frame", frame) #show the other video feed only
+    cv2.imshow("Blended", blended) #show the blended result but draw faces from raw feeds as well 
 
     key = cv2.waitKey(1)
     if key == 27: #esc
