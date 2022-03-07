@@ -1,7 +1,6 @@
-#trying this:
+
 #two video feeds on top of each other (blended)
 #making opencv find landmarks in the blended frame basic detcttion is from https://www.youtube.com/watch?v=MrRGVOhARYY
-#also detect separately from two inputs, shwo only one feed but draw both faces 
 #print "one face" if faces "match", ie only one face found in the synce, print "two faces" when two are found
 #play with addweighted value: this affewcst results, there could be two output results with different added weights and different efects 
 #think about the effects: will the image be blurred, delanay, filter etc when match and what happens when that connection breaks? 
@@ -30,8 +29,15 @@ while True:
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
+    # blended image is here
+
+    blended = cv2.addWeighted(frame,0.5,frame2,0.5,0)
+    blendedgray = cv2.cvtColor(blended, cv2.COLOR_BGR2GRAY)
+
+
     faces= detector(gray)
     faces2= detector(gray2)
+    faces3 = detector(blendedgray)
     
     for face in faces:
         x1 = face.left()
@@ -60,7 +66,22 @@ while True:
                 y = landmarks2.part(n).y
                 cv2.circle(frame, (x, y), 6, (255, 0, 0), -1)
 
+
+    for face3 in faces3:
+        x1 = face3.left()
+        y1 = face3.top()
+        x2 = face3.right()
+        y2 = face3.bottom()
+        #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+        landmarks3 = predictor(blendedgray,face3)
+
+        for n in range(0, 68):
+                x = landmarks3.part(n).x
+                y = landmarks3.part(n).y
+                cv2.circle(frame, (x, y), 6, (0, 0, 255), -1) #drawing ghost faces from the blended frame that is not visible
+
     cv2.imshow("Frame", frame) #show the other video feed only
+    #cv2.imshow("Frame", frame) #show the other video feed only
 
     key = cv2.waitKey(1)
     if key == 27: #esc
