@@ -67,10 +67,10 @@ while True:
                 lefteyeY = landmarks.part(38).y
                 righteyeX = landmarks.part(45).x #45
                 righteyeY = landmarks.part(45).y 
-                print("feed1", lefteyeX, lefteyeY, righteyeX, righteyeY)
-
-
+                 #print("feed1", lefteyeX, lefteyeY, righteyeX, righteyeY)
                 cv2.circle(frame, (x, y), 6, (0, 255, 0), -1)
+
+        print("feed1", lefteyeX, lefteyeY, righteyeX, righteyeY)
 
 
     for face2 in faces2:
@@ -88,10 +88,20 @@ while True:
                 lefteyeY2 = landmarks2.part(38).y
                 righteyeX2 = landmarks2.part(45).x
                 righteyeY2 = landmarks2.part(45).y
-                print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)
+                 #print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)
                 cv2.circle(frame, (x, y), 6, (255, 0, 0), -1)
 
-    #if a match..do sth here
+        print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)
+
+    #if a match..do sth here, example values here
+    # feed1 1215 329 1363 294
+    # feed2 571 287 790 381
+    # feed1 1207 328 1355 292
+    # feed2 740 177 956 282
+    # feed1 1205 335 1356 297
+    # feed2 678 217 899 324   
+
+    
 
 
 
