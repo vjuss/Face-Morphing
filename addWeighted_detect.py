@@ -1,6 +1,6 @@
 #steps for first MVP
-#1)alert when faces match (rect fine first)
-#2)add two output feeds
+#1)alert when faces match (rect fine first) DONE
+#2)add two output feeds DONE
 #3)test effetc: make addweighted a variable that changes on outputs when faces match in the og
 #4)introduce old frame sequences to outputs when faces match: what we see is no longer real time for a while and that has effect on detetcyopn
 #5)add timing to the effect if needed: will it continue until faces matc gain / 10 secs etv
@@ -71,14 +71,12 @@ while True:
     gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
     # blended image is here
-
-    blended = cv2.addWeighted(frame,0.5,frame2,0.5,0)
-    blendedgray = cv2.cvtColor(blended, cv2.COLOR_BGR2GRAY)
-
+    # blended = cv2.addWeighted(frame,0.5,frame2,0.5,0)
+    #blendedgray = cv2.cvtColor(blended, cv2.COLOR_BGR2GRAY)
 
     faces= detector(gray)
     faces2= detector(gray2)
-    faces3 = detector(blendedgray)
+    #faces3 = detector(blendedgray)
     
     for face in faces:
         faceleft = face.left()
@@ -86,19 +84,7 @@ while True:
         faceright = face.right()
         facebottom = face.bottom()
         cv2.rectangle(frame, (faceleft, facetop), (faceright, facebottom), (0, 255, 0), 3)
-        print("face 1", faceleft, facetop, faceright, facebottom)
-        # landmarks = predictor(gray,face)
-
-        # for n in range(0, 68):
-        #         x = landmarks.part(n).x
-        #         y = landmarks.part(n).y
-        #         lefteyeX = landmarks.part(38).x #38
-        #         lefteyeY = landmarks.part(38).y
-        #         righteyeX = landmarks.part(45).x #45
-        #         righteyeY = landmarks.part(45).y 
-        #         cv2.circle(frame, (x, y), 8, (0, 255, 0), -1)
-
-        #print("feed1", lefteyeX, lefteyeY, righteyeX, righteyeY)
+        #print("face 1", faceleft, facetop, faceright, facebottom)
 
 
     for face2 in faces2:
@@ -107,19 +93,7 @@ while True:
         faceright2 = face2.right()
         facebottom2 = face2.bottom()
         cv2.rectangle(frame, (faceleft2, facetop2), (faceright2, facebottom2), (0, 255, 0), 3)
-        print("face 2", faceleft2, facetop2, faceright2, facebottom2)
-        # landmarks2 = predictor(gray2,face2)
-
-        # for n in range(0, 68):
-        #         x = landmarks2.part(n).x
-        #         y = landmarks2.part(n).y
-        #         lefteyeX2 = landmarks2.part(38).x
-        #         lefteyeY2 = landmarks2.part(38).y
-        #         righteyeX2 = landmarks2.part(45).x
-        #         righteyeY2 = landmarks2.part(45).y
-        #         cv2.circle(frame, (x, y), 6, (255, 0, 0), -1)
-
-        #print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)ß
+        #print("face 2", faceleft2, facetop2, faceright2, facebottom2)
 
     closenessleft = math.isclose(faceleft, faceleft2, abs_tol = 70) #5 pixels
     closenesstop = math.isclose(facetop, facetop2, abs_tol = 70)
@@ -127,26 +101,16 @@ while True:
     closenessbottom = math.isclose(facebottom, facebottom2, abs_tol = 70)
 
     if closenessleft == True and closenesstop == True and closenessright == True and closenessbottom == True:
-        print("face matches")
-
-    # if lefteyeX ==lefteyeX2 and lefteyeY==lefteyeY2 and righteyeX==righteyeX2 and righteyeY==righteyeY2:
-    #     print("eyes match exactly")
+        print("faces match")
 
 
-    # for face3 in faces3:
-    #     x1 = face3.left()
-    #     y1 = face3.top()
-    #     x2 = face3.right()
-    #     y2 = face3.bottom()
-    #     #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-    #     landmarks3 = predictor(blendedgray,face3)
+    #two outputs for showing effects and feedback    
+    output1 = cv2.addWeighted(frame,0.9,frame2,0.1,0)
+    output2 = cv2.addWeighted(frame,0.1,frame2,0.9,0)
+    combination = np.concatenate((frame, output1, output2), axis=0)
 
-    #     for n in range(0, 68):
-    #             x = landmarks3.part(n).x
-    #             y = landmarks3.part(n).y
-    #             cv2.circle(frame, (x, y), 6, (0, 0, 255), -1) #drawing ghost faces from the blended frame that is not visible
+    cv2.imshow("Feeds", combination) #showing input and detection
 
-    cv2.imshow("Frame", frame) #show the other video feed only
     #cv2.imshow("Blended", blended) #show the blended result but draw faces from raw feeds as well 
 
     key = cv2.waitKey(1)
