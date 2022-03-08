@@ -1,7 +1,18 @@
-#print "one face" if faces "match"
+#steps for first MVP
+#1)alert when faces match (rect fine first)
+#2)add two output feeds
+#3)test effetc: make addweighted a variable that changes on outputs when faces match in the og
+#4)introduce old frame sequences to outputs when faces match: what we see is no longer real time for a while and that has effect on detetcyopn
+#5)add timing to the effect if needed: will it continue until faces matc gain / 10 secs etv
+#6)delanay etc blurring can make it difficult to detect whose face it is and thus match. it can gap two people or one person in diff times
+
+
+#IDEAS
+#maybe face analysis is being done on outputs at some point instead
 #play with addweighted value: this affewcst results, there could be two output results with different added weights and different detections 
 #think about the effects: will the image be blurred, delanay, filter etc when match and what happens when that connection breaks? 
-# will the resulting effect break the connection by blurring etc. making face not visibles
+# potentially touch the raw feed as well: will the resulting effect break the connection by blurring etc. making face not visibles
+# in output feeds, delanay can make it difficult to detect whose face it is and thus match
 #one way to do it: introduce old frame sequences when faces match: what we see is no longer real time for a while and that has effect on detetcyopn
 #study this for effects https://docs.opencv.org/4.x/d2/d96/tutorial_py_table_of_contents_imgproc.html
 #will the effect bridge time gaps instead of two people? or both
@@ -12,8 +23,8 @@ import numpy as np
 import dlib
 from PIL import Image
 
-cap = cv2.VideoCapture(1)
-cap2 = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)
+cap2 = cv2.VideoCapture(1)
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
@@ -57,7 +68,7 @@ while True:
         y1 = face.top()
         x2 = face.right()
         y2 = face.bottom()
-        #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
         landmarks = predictor(gray,face)
 
         for n in range(0, 68):
@@ -67,10 +78,9 @@ while True:
                 lefteyeY = landmarks.part(38).y
                 righteyeX = landmarks.part(45).x #45
                 righteyeY = landmarks.part(45).y 
-                 #print("feed1", lefteyeX, lefteyeY, righteyeX, righteyeY)
-                cv2.circle(frame, (x, y), 6, (0, 255, 0), -1)
+                cv2.circle(frame, (x, y), 8, (0, 255, 0), -1)
 
-        print("feed1", lefteyeX, lefteyeY, righteyeX, righteyeY)
+        #print("feed1", lefteyeX, lefteyeY, righteyeX, righteyeY)
 
 
     for face2 in faces2:
@@ -78,7 +88,7 @@ while True:
         y1 = face2.top()
         x2 = face2.right()
         y2 = face2.bottom()
-        #cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
         landmarks2 = predictor(gray2,face2)
 
         for n in range(0, 68):
@@ -88,10 +98,9 @@ while True:
                 lefteyeY2 = landmarks2.part(38).y
                 righteyeX2 = landmarks2.part(45).x
                 righteyeY2 = landmarks2.part(45).y
-                 #print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)
                 cv2.circle(frame, (x, y), 6, (255, 0, 0), -1)
 
-        print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)
+        #print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)
 
     #if a match..do sth here, example values here
     # feed1 1215 329 1363 294
@@ -101,10 +110,8 @@ while True:
     # feed1 1205 335 1356 297
     # feed2 678 217 899 324   
 
-    
-
-
-
+    if lefteyeX ==lefteyeX2 and lefteyeY==lefteyeY2 and righteyeX==righteyeX2 and righteyeY==righteyeY2:
+        print("eyes match exactly")
 
 
     # for face3 in faces3:
