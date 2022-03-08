@@ -1,21 +1,27 @@
 #steps for first MVP
 #1)alert when faces match (rect fine first) DONE
 #2)add two output feeds DONE
-#3)test effetc: make addweighted a variable that changes on outputs when faces match in the og
-#4)introduce old frame sequences to outputs when faces match: what we see is no longer real time for a while and that has effect on detetcyopn
+#3)test effetc: make addweighted a variable that changes on outputs when faces match in the og DONE
+#4)introduce old frame sequences to outputs when faces match: 
+# what we see is no longer real time for a while and that has effect on detetcyopn
 #5)add timing to the effect if needed: will it continue until faces matc gain / 10 secs etv
 #6)delanay etc blurring can make it difficult to detect whose face it is and thus match. it can gap two people or one person in diff times
-
+#7)improve performance: try threads and maybe switch from python to openframeworks or use lighter face detection model
 
 #IDEAS
 #maybe face analysis is being done on outputs at some point instead
-#play with addweighted value: this affewcst results, there could be two output results with different added weights and different detections 
+#play with addweighted value(s;ider): this can make your own face disappear and the other appear, this affewcst results, there could be two output results with different added weights and different detections 
 #think about the effects: will the image be blurred, delanay, filter etc when match and what happens when that connection breaks? 
 # potentially touch the raw feed as well: will the resulting effect break the connection by blurring etc. making face not visibles
 # in output feeds, delanay can make it difficult to detect whose face it is and thus match
-#one way to do it: introduce old frame sequences when faces match: what we see is no longer real time for a while and that has effect on detetcyopn
 #study this for effects https://docs.opencv.org/4.x/d2/d96/tutorial_py_table_of_contents_imgproc.html
 #will the effect bridge time gaps instead of two people? or both
+#add a model that recognises when face is diff from other face and explore when it only sees one face
+#replace eyes with other persons eyes: try spliot scanning
+#add glitches from third webcam (observer of both peple, space) to the mix
+#blurrinf etc transition effects
+#sound
+# potentially add ml to generate nww faces
 
 
 import cv2
@@ -45,20 +51,10 @@ faceright2 = 0
 facebottom2 = 0
 
 
-#eye coord variables for video 1
+#for handling old sequences
 
-lefteyeX = 0 #38
-lefteyeY = 0 #45
-righteyeX = 0 
-righteyeY = 0 
-
-#eye coord variables for video 2
-
-lefteyeX2 = 0
-lefteyeY2 = 0
-righteyeX2 = 0
-righteyeY2 = 0
-
+pastframes1 = list()
+pastframes2 = list()
 
 while True:
 
@@ -70,13 +66,8 @@ while True:
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
-    # blended image is here
-    # blended = cv2.addWeighted(frame,0.5,frame2,0.5,0)
-    #blendedgray = cv2.cvtColor(blended, cv2.COLOR_BGR2GRAY)
-
     faces= detector(gray)
     faces2= detector(gray2)
-    #faces3 = detector(blendedgray)
     
     for face in faces:
         faceleft = face.left()
@@ -102,18 +93,26 @@ while True:
 
     if closenessleft == True and closenesstop == True and closenessright == True and closenessbottom == True:
         print("faces match")
-        weightframe1 = 0.9
-        weightframe2 = 0.1
+        pastframes1.append(frame)  #if faces match, append raw frames to a list for a while
+        pastframes2.append(frame2)  #
+        weightframe1 = 0.7
+        weightframe2 = 0.3
+    
     else:
-        weightframe1 = 0.1
-        weightframe2 = 0.9
+        weightframe1 = 0.3
+        weightframe2 = 0.7
+
+    #two outputs for showing effects and feedback    
+     #output1 = cv2.addWeighted(frame, weightframe1,frame2, weightframe2, 0)
+    # output2 = cv2.addWeighted(frame, weightframe2,frame2, weightframe1, 0)
+     #combination = np.concatenate((frame, output1, output2), axis=0)
 
     #two outputs for showing effects and feedback    
     output1 = cv2.addWeighted(frame, weightframe1,frame2, weightframe2, 0)
-    output2 = cv2.addWeighted(frame, weightframe1,frame2, weightframe2, 0)
-    combination = np.concatenate((frame, output1, output2), axis=0)
+    output2 = cv2.addWeighted(frame, weightframe2,frame2, weightframe1, 0)
+    outputs = np.concatenate((output1, output2), axis=0)
 
-    cv2.imshow("Feeds", combination) #showing input and detection
+    cv2.imshow("Outputs", outputs) #showing input and detection
 
     #cv2.imshow("Blended", blended) #show the blended result but draw faces from raw feeds as well 
 
@@ -122,4 +121,5 @@ while True:
         break
 
 
+# cv2.destroyAllWindows() # destroys the window showing image
 # cv2.destroyAllWindows() # destroys the window showing image
