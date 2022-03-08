@@ -102,11 +102,15 @@ while True:
 
     if closenessleft == True and closenesstop == True and closenessright == True and closenessbottom == True:
         print("faces match")
-
+        weightframe1 = 0.9
+        weightframe2 = 0.1
+    else:
+        weightframe1 = 0.1
+        weightframe2 = 0.9
 
     #two outputs for showing effects and feedback    
-    output1 = cv2.addWeighted(frame,0.9,frame2,0.1,0)
-    output2 = cv2.addWeighted(frame,0.1,frame2,0.9,0)
+    output1 = cv2.addWeighted(frame, weightframe1,frame2, weightframe2, 0)
+    output2 = cv2.addWeighted(frame, weightframe1,frame2, weightframe2, 0)
     combination = np.concatenate((frame, output1, output2), axis=0)
 
     cv2.imshow("Feeds", combination) #showing input and detection
