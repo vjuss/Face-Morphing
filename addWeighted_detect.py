@@ -22,11 +22,28 @@ import cv2
 import numpy as np
 import dlib
 from PIL import Image
+import math
 
 cap = cv2.VideoCapture(0)
 cap2 = cv2.VideoCapture(1)
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
+
+
+#face coord variables for video 1
+
+faceleft = 0
+facetop = 0
+faceright = 0
+facebottom = 0
+
+#face coord variables for video 2
+
+faceleft2 = 0
+facetop2 = 0
+faceright2 = 0
+facebottom2 = 0
+
 
 #eye coord variables for video 1
 
@@ -64,54 +81,56 @@ while True:
     faces3 = detector(blendedgray)
     
     for face in faces:
-        x1 = face.left()
-        y1 = face.top()
-        x2 = face.right()
-        y2 = face.bottom()
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-        landmarks = predictor(gray,face)
+        faceleft = face.left()
+        facetop = face.top()
+        faceright = face.right()
+        facebottom = face.bottom()
+        cv2.rectangle(frame, (faceleft, facetop), (faceright, facebottom), (0, 255, 0), 3)
+        print("face 1", faceleft, facetop, faceright, facebottom)
+        # landmarks = predictor(gray,face)
 
-        for n in range(0, 68):
-                x = landmarks.part(n).x
-                y = landmarks.part(n).y
-                lefteyeX = landmarks.part(38).x #38
-                lefteyeY = landmarks.part(38).y
-                righteyeX = landmarks.part(45).x #45
-                righteyeY = landmarks.part(45).y 
-                cv2.circle(frame, (x, y), 8, (0, 255, 0), -1)
+        # for n in range(0, 68):
+        #         x = landmarks.part(n).x
+        #         y = landmarks.part(n).y
+        #         lefteyeX = landmarks.part(38).x #38
+        #         lefteyeY = landmarks.part(38).y
+        #         righteyeX = landmarks.part(45).x #45
+        #         righteyeY = landmarks.part(45).y 
+        #         cv2.circle(frame, (x, y), 8, (0, 255, 0), -1)
 
         #print("feed1", lefteyeX, lefteyeY, righteyeX, righteyeY)
 
 
     for face2 in faces2:
-        x1 = face2.left()
-        y1 = face2.top()
-        x2 = face2.right()
-        y2 = face2.bottom()
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-        landmarks2 = predictor(gray2,face2)
+        faceleft2 = face2.left()
+        facetop2 = face2.top()
+        faceright2 = face2.right()
+        facebottom2 = face2.bottom()
+        cv2.rectangle(frame, (faceleft2, facetop2), (faceright2, facebottom2), (0, 255, 0), 3)
+        print("face 2", faceleft2, facetop2, faceright2, facebottom2)
+        # landmarks2 = predictor(gray2,face2)
 
-        for n in range(0, 68):
-                x = landmarks2.part(n).x
-                y = landmarks2.part(n).y
-                lefteyeX2 = landmarks2.part(38).x
-                lefteyeY2 = landmarks2.part(38).y
-                righteyeX2 = landmarks2.part(45).x
-                righteyeY2 = landmarks2.part(45).y
-                cv2.circle(frame, (x, y), 6, (255, 0, 0), -1)
+        # for n in range(0, 68):
+        #         x = landmarks2.part(n).x
+        #         y = landmarks2.part(n).y
+        #         lefteyeX2 = landmarks2.part(38).x
+        #         lefteyeY2 = landmarks2.part(38).y
+        #         righteyeX2 = landmarks2.part(45).x
+        #         righteyeY2 = landmarks2.part(45).y
+        #         cv2.circle(frame, (x, y), 6, (255, 0, 0), -1)
 
-        #print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)
+        #print("feed2", lefteyeX2, lefteyeY2, righteyeX2, righteyeY2)ß
 
-    #if a match..do sth here, example values here
-    # feed1 1215 329 1363 294
-    # feed2 571 287 790 381
-    # feed1 1207 328 1355 292
-    # feed2 740 177 956 282
-    # feed1 1205 335 1356 297
-    # feed2 678 217 899 324   
+    closenessleft = math.isclose(faceleft, faceleft2, abs_tol = 70) #5 pixels
+    closenesstop = math.isclose(facetop, facetop2, abs_tol = 70)
+    closenessright = math.isclose(faceright, faceright2, abs_tol = 70)
+    closenessbottom = math.isclose(facebottom, facebottom2, abs_tol = 70)
 
-    if lefteyeX ==lefteyeX2 and lefteyeY==lefteyeY2 and righteyeX==righteyeX2 and righteyeY==righteyeY2:
-        print("eyes match exactly")
+    if closenessleft == True and closenesstop == True and closenessright == True and closenessbottom == True:
+        print("face matches")
+
+    # if lefteyeX ==lefteyeX2 and lefteyeY==lefteyeY2 and righteyeX==righteyeX2 and righteyeY==righteyeY2:
+    #     print("eyes match exactly")
 
 
     # for face3 in faces3:
