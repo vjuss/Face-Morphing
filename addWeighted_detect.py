@@ -20,6 +20,7 @@
 #replace eyes with other persons eyes: try spliot scanning
 #add glitches from third webcam (observer of both peple, space) to the mix
 #blurrinf etc transition effects
+# goal is to make eyes align
 #sound
 # potentially add ml to generate nww faces
 
@@ -30,6 +31,11 @@ import dlib
 from PIL import Image
 import math
 
+
+#for handling old sequences
+pastframes1 = list()
+pastframes2 = list()
+
 cap = cv2.VideoCapture(0)
 cap2 = cv2.VideoCapture(1)
 detector = dlib.get_frontal_face_detector()
@@ -37,24 +43,19 @@ predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
 
 #face coord variables for video 1
-
 faceleft = 0
 facetop = 0
 faceright = 0
 facebottom = 0
 
 #face coord variables for video 2
-
 faceleft2 = 0
 facetop2 = 0
 faceright2 = 0
 facebottom2 = 0
 
-
-#for handling old sequences
-
-pastframes1 = list()
-pastframes2 = list()
+is_recording = False
+has_recorded = False
 
 while True:
 
@@ -93,23 +94,40 @@ while True:
 
     if closenessleft == True and closenesstop == True and closenessright == True and closenessbottom == True:
         print("faces match")
-        pastframes1.append(frame)  #if faces match, append raw frames to a list for a while
-        pastframes2.append(frame2)  #
+        is_recording = True
+        has_recorded = True
+        pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
+        pastframes2.append(frame2) #
+
         weightframe1 = 0.7
         weightframe2 = 0.3
-    
+
     else:
+        is_recording = False
         weightframe1 = 0.3
         weightframe2 = 0.7
 
-    #two outputs for showing effects and feedback    
-     #output1 = cv2.addWeighted(frame, weightframe1,frame2, weightframe2, 0)
-    # output2 = cv2.addWeighted(frame, weightframe2,frame2, weightframe1, 0)
-     #combination = np.concatenate((frame, output1, output2), axis=0)
+    #here an if condition to decide whether we use live feed or the saved loop
+
+    if is_recording == False and has_recorded == True: #if something has been saved
+        print("using old loop")
+        
+        displayframe2 = frame2 # use og
+        print(len(pastframes1))
+
+        for i in range (len(pastframes1)):
+            displayframe1 = pastframes1[i]
+            output1 = cv2.addWeighted(displayframe1, weightframe1,displayframe2, weightframe2, 0)
+            output2 = cv2.addWeighted(displayframe1, weightframe2,displayframe2, weightframe1, 0)
+
+    else:
+        displayframe1 = frame # use og
+        displayframe2 = frame2 # use og
+        output1 = cv2.addWeighted(displayframe1, weightframe1,displayframe2, weightframe2, 0)
+        output2 = cv2.addWeighted(displayframe1, weightframe2,displayframe2, weightframe1, 0)
 
     #two outputs for showing effects and feedback    
-    output1 = cv2.addWeighted(frame, weightframe1,frame2, weightframe2, 0)
-    output2 = cv2.addWeighted(frame, weightframe2,frame2, weightframe1, 0)
+
     outputs = np.concatenate((output1, output2), axis=0)
 
     cv2.imshow("Outputs", outputs) #showing input and detection
@@ -120,6 +138,5 @@ while True:
     if key == 27: #esc
         break
 
+cv2.destroyAllWindows()
 
-# cv2.destroyAllWindows() # destroys the window showing image
-# cv2.destroyAllWindows() # destroys the window showing image
