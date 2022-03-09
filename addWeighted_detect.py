@@ -26,6 +26,7 @@
 # one helpful sourcve for threading has been https://github.com/jpark7ca/face_recognition/blob/master/face_recognition_webcam_mt.py
 
 import cv2
+from cv2 import FLOODFILL_FIXED_RANGE
 import numpy as np
 import dlib
 from PIL import Image
@@ -79,24 +80,7 @@ def main():
     pastframes1 = list()
     pastframes2 = list()
 
-    detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
-
-    #face coord variables for video 1
-    faceleft = 0
-    facetop = 0
-    faceright = 0
-    facebottom = 0
-
-    #face coord variables for video 2
-    faceleft2 = 0
-    facetop2 = 0
-    faceright2 = 0
-    facebottom2 = 0
-
-    is_recording = False
-    has_recorded = False
-
 
     while True:
 
@@ -104,56 +88,31 @@ def main():
                 video_capture.stop()
                 break
 
-        #frame = video_capture.read()
-
         matchresult = video_process.match
         print(matchresult)
-        frame = video_capture.frame
-        frame2 = video_capture2.frame
-        frame3= video_capture2.frame#placeholder, will show video from the room
-        frame4= video_capture2.frame#placeholder, will show video from the room
 
-        #if ret1==False or ret2==False: #add better errorhandling to videogetter later, cam not available etc
-            # break
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
-
-        faces= detector(gray)
-        faces2= detector(gray2)
-        
-        for face in faces:
-            faceleft = face.left()
-            facetop = face.top()
-            faceright = face.right()
-            facebottom = face.bottom()
-            cv2.rectangle(frame, (faceleft, facetop), (faceright, facebottom), (0, 255, 0), 3)
-
-        for face2 in faces2:
-            faceleft2 = face2.left()
-            facetop2 = face2.top()
-            faceright2 = face2.right()
-            facebottom2 = face2.bottom()
-            cv2.rectangle(frame, (faceleft2, facetop2), (faceright2, facebottom2), (0, 255, 0), 3)
-
-        closenessleft = math.isclose(faceleft, faceleft2, abs_tol = 70) #5 pixels
-        closenesstop = math.isclose(facetop, facetop2, abs_tol = 70)
-        closenessright = math.isclose(faceright, faceright2, abs_tol = 70)
-        closenessbottom = math.isclose(facebottom, facebottom2, abs_tol = 70)
-
-        if closenessleft == True and closenesstop == True and closenessright == True and closenessbottom == True:
-            print("faces match")
-            is_recording = True
-            has_recorded = True
+        if matchresult == True:
+            #its a match, do delanay
+            frame = video_capture.frame
+            frame2 = video_capture2.frame
             pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
             pastframes2.append(frame2) #
 
-            #delanay effect neing used here
+            #delanay effect neing used here, make this a class to avoid repetition
+
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+
+            #Find faces
+            detector = dlib.get_frontal_face_detector()
+
+            faces= detector(gray)
+            faces2= detector(gray2)
 
             mask = np.zeros_like(gray)
             height, width, channels = frame2.shape
             img2_new_face = np.zeros((height, width, channels), np.uint8)
             indexes_triangles = []
-
 
             mask2 = np.zeros_like(gray2)
             height2, width2, channels2 = frame.shape
@@ -316,11 +275,12 @@ def main():
             #if morphing in progress, frame3 becomes our morph result
             frame3 = seamlessclone
             frame4 = seamlessclone2
-
-
+        
         else:
-            is_recording = False
-
+            frame = video_capture.frame
+            frame2 = video_capture2.frame
+            frame3= video_capture2.frame#placeholder, will show video from the room
+            frame4= video_capture2.frame#placeholder, will show video from the room
 
         inputs = np.concatenate((frame, frame2), axis=0)
         outputs = np.concatenate((frame3, frame4), axis=0)
@@ -333,6 +293,11 @@ def main():
         key = cv2.waitKey(1)
         if key == 27: #esc
             break
+
+    # Release handle to the webcam
+    #video_capture.stop()
+    #video_capture2.stop()
+    #video_process.stop()
 
     cv2.destroyAllWindows()
 
