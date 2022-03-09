@@ -71,6 +71,7 @@ while True:
     ret1, frame = cap.read()
     ret2, frame2= cap2.read()
     ret3, frame3= cap2.read()#placeholder, will show video from the room
+    ret4, frame4= cap2.read()#placeholder, will show video from the room
 
     if ret1==False or ret2==False:
         break
@@ -86,7 +87,6 @@ while True:
         faceright = face.right()
         facebottom = face.bottom()
         cv2.rectangle(frame, (faceleft, facetop), (faceright, facebottom), (0, 255, 0), 3)
-        #print("face 1", faceleft, facetop, faceright, facebottom)
 
     for face2 in faces2:
         faceleft2 = face2.left()
@@ -94,7 +94,6 @@ while True:
         faceright2 = face2.right()
         facebottom2 = face2.bottom()
         cv2.rectangle(frame, (faceleft2, facetop2), (faceright2, facebottom2), (0, 255, 0), 3)
-        #print("face 2", faceleft2, facetop2, faceright2, facebottom2)
 
     closenessleft = math.isclose(faceleft, faceleft2, abs_tol = 70) #5 pixels
     closenesstop = math.isclose(facetop, facetop2, abs_tol = 70)
@@ -115,6 +114,14 @@ while True:
         img2_new_face = np.zeros((height, width, channels), np.uint8)
         indexes_triangles = []
 
+
+        mask2 = np.zeros_like(gray2)
+        height2, width2, channels2 = frame.shape
+        img1_new_face = np.zeros((height2, width2, channels2), np.uint8)
+        indexes_triangles2 = []
+
+        #landmarks of first face
+
         for face in faces:
             landmarks = predictor(gray, face)
             landmarks_points = []
@@ -129,6 +136,7 @@ while True:
             cv2.fillConvexPoly(mask, convexhull, 255)    
             
             face_image_1 = cv2.bitwise_and(frame, frame, mask=mask)
+     
 
             # Delaunay triangulation
 
@@ -170,6 +178,8 @@ while True:
 
             points2 = np.array(landmarks_points2, np.int32)
             convexhull2 = cv2.convexHull(points2)
+            cv2.fillConvexPoly(mask2, convexhull2, 255)  
+            face_image_2 = cv2.bitwise_and(frame2, frame2, mask=mask2)
 
 
         # Creating empty mask
@@ -239,24 +249,33 @@ while True:
 
         #Face swapped (putting 1st face into 2nd face)
         img2_face_mask = np.zeros_like(gray2)
-        img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, 120) #255 is full opacity
+        img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, 100) #255 is full opacity
+        img2_head_mask2 = cv2.fillConvexPoly(img2_face_mask, convexhull2, 220) #255 is full opacity
         img2_face_mask = cv2.bitwise_not(img2_head_mask)
+        img2_face_mask2 = cv2.bitwise_not(img2_head_mask2)
 
         img2_head_noface = cv2.bitwise_and(frame2, frame2, mask=img2_face_mask)
+        img2_head_noface2 = cv2.bitwise_and(frame2, frame2, mask=img2_face_mask2)
         result = cv2.add(img2_head_noface, img2_new_face)
+        result2 = cv2.add(img2_head_noface2, img2_new_face)
 
         # Creating seamless clone of two faces
         (x, y, w, h) = cv2.boundingRect(convexhull2)
         center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
         seamlessclone = cv2.seamlessClone(result, frame2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
         seamlessclone = cv2.cvtColor(seamlessclone, cv2.COLOR_BGR2GRAY)
+
+        seamlessclone2 = cv2.seamlessClone(result2, frame2, img2_head_mask2, center_face2, cv2.NORMAL_CLONE)
+        seamlessclone2 = cv2.cvtColor(seamlessclone2, cv2.COLOR_BGR2GRAY)
+
+
         # Converting array to image
         #resultimage = Image.fromarray(seamlessclone)
-
         #cv2.imshow("result", seamlessclone) #
 
         #if morphing in progress, frame3 becomes our morph result
         frame3 = seamlessclone
+        frame4 = seamlessclone2
 
 
     else:
@@ -265,9 +284,10 @@ while True:
     #two outputs for showing effects and feedback    
 
     inputs = np.concatenate((frame, frame2), axis=0)
+    outputs = np.concatenate((frame3, frame4), axis=0)
 
-    cv2.imshow("Inputs", inputs) #showing input and detection
-    cv2.imshow("Result", frame3) #showing input and detection
+    #cv2.imshow("Inputs", inputs) #showing input and detection
+    cv2.imshow("Result", outputs) #showing input and detection
 
     key = cv2.waitKey(1)
     if key == 27: #esc
