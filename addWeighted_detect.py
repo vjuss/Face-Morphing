@@ -16,7 +16,7 @@
 # in output feeds, delanay can make it difficult to detect whose face it is and thus match
 #study this for effects https://docs.opencv.org/4.x/d2/d96/tutorial_py_table_of_contents_imgproc.html
 #will the effect bridge time gaps instead of two people? or both
-#add a model that recognises when face is diff from other face and explore when it only sees one face
+#add a model that recognises when face is diff from other face and explore when it only sees one face!!
 #replace eyes with other persons eyes: try spliot scanning
 #add glitches from third webcam (observer of both peple, space) to the mix
 #blurrinf etc transition effects
@@ -30,6 +30,7 @@ import numpy as np
 import dlib
 from PIL import Image
 import math
+from VideoGet import VideoGet
 
 # Helper function for extracting index from array
 def extract_index_nparray(nparray):
@@ -39,6 +40,18 @@ def extract_index_nparray(nparray):
         break
     return index
 
+def threadVideoget(source=0):
+    video_getter = VideoGet(source).start()
+    #cps = CountsPerSec().start()
+
+    while True:
+        if (cv2.waitKey(1) == ord("q")) or video_getter.stopped:
+            video_getter.stop()
+            break
+        frame = video_getter.frame
+        #frame = putIterationsPerSec(frame, cps.countsPerSec())
+        cv2.imshow("Video", frame)
+        #cps.increment()
 
 
 #for handling old sequences
@@ -47,6 +60,10 @@ pastframes2 = list()
 
 cap = cv2.VideoCapture(0)
 cap2 = cv2.VideoCapture(1)
+
+threadVideoget(0) #inits while loop for getting frames from camera 0
+threadVideoget(1) #inits while loop for getting frames from camera 1
+
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
@@ -285,6 +302,9 @@ while True:
 
     inputs = np.concatenate((frame, frame2), axis=0)
     outputs = np.concatenate((frame3, frame4), axis=0)
+    print(len(pastframes1))
+    print(len(pastframes2))
+
 
     #cv2.imshow("Inputs", inputs) #showing input and detection
     cv2.imshow("Result", outputs) #showing input and detection
