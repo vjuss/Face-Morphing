@@ -11,8 +11,9 @@ class CheckFaceLoc:
         self.capture1 = capture1
         self.capture2 = capture2
         self.stopped = False
-        self.face_locations = []
         self.match = False
+        self.faces = ()
+        self.faces2 = ()
 
     def start(self):
         Thread(target=self.process, args=()).start()
@@ -33,6 +34,8 @@ class CheckFaceLoc:
 
             _faces= detector(_gray)
             _faces2= detector(_gray2)
+            self.faces = _faces
+            self.faces2 = _faces2
 
             #Find face coords
 

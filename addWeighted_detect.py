@@ -24,6 +24,7 @@
 #sound
 # potentially add ml to generate nww faces
 # one helpful sourcve for threading has been https://github.com/jpark7ca/face_recognition/blob/master/face_recognition_webcam_mt.py
+# next up: make delanay into a thread and class, check the tutorial above for performance
 
 import cv2
 from cv2 import FLOODFILL_FIXED_RANGE
@@ -100,14 +101,11 @@ def main():
 
             #delanay effect neing used here, make this a class to avoid repetition
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            faces = video_process.faces
+            faces2 = video_process.faces2
+
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  #for example this is repetition
             gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
-
-            #Find faces
-            detector = dlib.get_frontal_face_detector()
-
-            faces= detector(gray)
-            faces2= detector(gray2)
 
             mask = np.zeros_like(gray)
             height, width, channels = frame2.shape
@@ -297,7 +295,7 @@ def main():
     # Release handle to the webcam
     #video_capture.stop()
     #video_capture2.stop()
-    #video_process.stop()
+   # video_process.stop()
 
     cv2.destroyAllWindows()
 
