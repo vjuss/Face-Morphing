@@ -70,6 +70,7 @@ while True:
 
     ret1, frame = cap.read()
     ret2, frame2= cap2.read()
+    ret3, frame3= cap2.read()#placeholder, will show video from the room
 
     if ret1==False or ret2==False:
         break
@@ -107,7 +108,7 @@ while True:
         pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
         pastframes2.append(frame2) #
 
-        #delanay here
+        #delanay effect neing used here
 
         mask = np.zeros_like(gray)
         height, width, channels = frame2.shape
@@ -238,7 +239,7 @@ while True:
 
         #Face swapped (putting 1st face into 2nd face)
         img2_face_mask = np.zeros_like(gray2)
-        img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, 255)
+        img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, 120) #255 is full opacity
         img2_face_mask = cv2.bitwise_not(img2_head_mask)
 
         img2_head_noface = cv2.bitwise_and(frame2, frame2, mask=img2_face_mask)
@@ -248,11 +249,14 @@ while True:
         (x, y, w, h) = cv2.boundingRect(convexhull2)
         center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
         seamlessclone = cv2.seamlessClone(result, frame2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
-
+        seamlessclone = cv2.cvtColor(seamlessclone, cv2.COLOR_BGR2GRAY)
         # Converting array to image
-        resultimage = Image.fromarray(seamlessclone)
+        #resultimage = Image.fromarray(seamlessclone)
 
-        cv2.imshow("result", seamlessclone) # this shows blue face
+        #cv2.imshow("result", seamlessclone) #
+
+        #if morphing in progress, frame3 becomes our morph result
+        frame3 = seamlessclone
 
 
     else:
@@ -260,11 +264,10 @@ while True:
 
     #two outputs for showing effects and feedback    
 
-    outputs = np.concatenate((frame, frame2), axis=0)
+    inputs = np.concatenate((frame, frame2), axis=0)
 
-    cv2.imshow("Outputs", outputs) #showing input and detection
-
-    #cv2.imshow("Blended", blended) #show the blended result but draw faces from raw feeds as well 
+    cv2.imshow("Inputs", inputs) #showing input and detection
+    cv2.imshow("Result", frame3) #showing input and detection
 
     key = cv2.waitKey(1)
     if key == 27: #esc
