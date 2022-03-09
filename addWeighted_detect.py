@@ -52,7 +52,7 @@ def threadVideoget(source=0):
     #cps = CountsPerSec().start()
 
     while True:
-        if (cv2.waitKey(1) == ord("q")) or video_getter.stopped:
+        if (cv2.waitKey(1) == 27) or video_getter.stopped:
             video_getter.stop()
             break
         #frame = video_getter.frame
@@ -60,16 +60,18 @@ def threadVideoget(source=0):
         #cv2.imshow("Video", frame)
 
         if source==0:
-            frame=video_getter.frame
-            #cv2.imshow("Video", frame)
+            frame=video_getter.frame  #fill frame with input
+            cv2.imshow("Video", frame)
         if source==1:
-            frame2=video_getter.frame
-            #cv2.imshow("Video2", frame2)
+            frame2=video_getter.frame #fill frame2 with input
+            cv2.imshow("Video2", frame2)
 
         #cps.increment()
 
 threadVideoget(0) #inits while loop for getting frames from camera 0
 threadVideoget(1) #inits while loop for getting frames from camera 1
+#cv2.imshow("Video", frame)# this is for debugging, frame and frame2 don't transfer from function to here. remains empty
+#cv2.imshow("Video2", frame2)
 
 
 #for handling old sequences
@@ -105,7 +107,7 @@ while True:
     ret3, frame3= cap2.read()#placeholder, will show video from the room
     ret4, frame4= cap2.read()#placeholder, will show video from the room
 
-    if ret1==False or ret2==False:
+    if ret1==False or ret2==False: #add better errorhandling to videogetter later, cam not available etc
         break
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
@@ -321,7 +323,7 @@ while True:
     print(len(pastframes2))
 
 
-    #cv2.imshow("Inputs", inputs) #showing input and detection
+    cv2.imshow("Inputs", inputs) #showing input and detection
     cv2.imshow("Result", outputs) #showing input and detection
 
     key = cv2.waitKey(1)
