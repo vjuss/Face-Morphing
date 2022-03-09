@@ -23,7 +23,7 @@
 # goal is to make eyes align
 #sound
 # potentially add ml to generate nww faces
-
+# one helpful sourcve for threading has been https://github.com/jpark7ca/face_recognition/blob/master/face_recognition_webcam_mt.py
 
 import cv2
 import numpy as np
@@ -31,6 +31,7 @@ import dlib
 from PIL import Image
 import math
 from VideoGet import VideoGet
+from CheckFaceLoc import CheckFaceLoc
 
 
 # Helper function for extracting index from array
@@ -69,8 +70,10 @@ def main():
     video_capture = VideoGet(src=0).start()
     video_capture2 = VideoGet(src=1).start()
 
-    #threadVideoget(0) #inits while loop for getting frames from camera 0
-    #threadVideoget(1) #inits while loop for getting frames from camera 1
+    video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2).start()
+
+    #threadVideoget(0) #this is very quick as no processing in this thread. here as comparison for testing
+    #threadVideoget(1) #
 
     #for handling old sequences
     pastframes1 = list()
@@ -101,10 +104,14 @@ def main():
                 video_capture.stop()
                 break
 
-        frame = video_capture.read()
-        frame2 = video_capture2.read()
-        frame3= video_capture2.read()#placeholder, will show video from the room
-        frame4= video_capture2.read()#placeholder, will show video from the room
+        #frame = video_capture.read()
+
+        matchresult = video_process.match
+        print(matchresult)
+        frame = video_capture.frame
+        frame2 = video_capture2.frame
+        frame3= video_capture2.frame#placeholder, will show video from the room
+        frame4= video_capture2.frame#placeholder, will show video from the room
 
         #if ret1==False or ret2==False: #add better errorhandling to videogetter later, cam not available etc
             # break
