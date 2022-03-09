@@ -32,6 +32,12 @@ from PIL import Image
 import math
 from VideoGet import VideoGet
 
+
+frame = None
+frame2 = None
+frame3 = None
+frame4 = None
+
 # Helper function for extracting index from array
 def extract_index_nparray(nparray):
     index = None
@@ -40,6 +46,7 @@ def extract_index_nparray(nparray):
         break
     return index
 
+# Function for utilizing our threading class
 def threadVideoget(source=0):
     video_getter = VideoGet(source).start()
     #cps = CountsPerSec().start()
@@ -48,21 +55,26 @@ def threadVideoget(source=0):
         if (cv2.waitKey(1) == ord("q")) or video_getter.stopped:
             video_getter.stop()
             break
-        frame = video_getter.frame
+        #frame = video_getter.frame
         #frame = putIterationsPerSec(frame, cps.countsPerSec())
-        cv2.imshow("Video", frame)
+        #cv2.imshow("Video", frame)
+
+        if source==0:
+            frame=video_getter.frame
+            #cv2.imshow("Video", frame)
+        if source==1:
+            frame2=video_getter.frame
+            #cv2.imshow("Video2", frame2)
+
         #cps.increment()
+
+threadVideoget(0) #inits while loop for getting frames from camera 0
+threadVideoget(1) #inits while loop for getting frames from camera 1
 
 
 #for handling old sequences
 pastframes1 = list()
 pastframes2 = list()
-
-cap = cv2.VideoCapture(0)
-cap2 = cv2.VideoCapture(1)
-
-threadVideoget(0) #inits while loop for getting frames from camera 0
-threadVideoget(1) #inits while loop for getting frames from camera 1
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -82,6 +94,9 @@ facebottom2 = 0
 
 is_recording = False
 has_recorded = False
+
+cap = cv2.VideoCapture(0)
+cap2 = cv2.VideoCapture(1)
 
 while True:
 
