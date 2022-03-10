@@ -75,10 +75,8 @@ def main():
             #This process is running fine and prints stuff at the end of its while loop, next step is to show the outputs
             delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = vidframe, frame2 = vidframe2, predictor = landmarkpredictor).start()
 
-            resultframe1 = delaunay_process.seamlessclone
-            resultframe2 = delaunay_process.seamlessclone2
-            frame3=resultframe1
-            frame4=resultframe2
+            frame3 = delaunay_process.seamlessclone
+            frame4 = delaunay_process.seamlessclone2
 
             #delanay effect neing used here, make this a class to avoid repetition
 
@@ -242,22 +240,14 @@ def main():
 
             # seamlessclone2 = cv2.seamlessClone(result2, frame2, img2_head_mask2, center_face2, cv2.NORMAL_CLONE)
             # seamlessclone2 = cv2.cvtColor(seamlessclone2, cv2.COLOR_BGR2GRAY)
-
-
-            # # Converting array to image
-            # #resultimage = Image.fromarray(seamlessclone)
             # #cv2.imshow("result", seamlessclone) #
-
-            # #if morphing in progress, frame3 becomes our morph result
-            # frame3 = seamlessclone
-            # frame4 = seamlessclone2
         
         else:
             frame3= vidframe #placeholder, will show video from the room
             frame4= vidframe2 #placeholder, will show video from the room
 
-        #outputs = np.concatenate((frame3, frame4), axis=0) CURRENT ERROR COMES HERE
-        #cv2.imshow("Result", outputs) #showing input and detection
+        outputs = np.concatenate((frame3, frame4), axis=0) 
+        cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
 
         key = cv2.waitKey(1)
         if key == 27: #esc
