@@ -34,7 +34,6 @@ class CheckFaceLoc:
 
             _faces= _detector(_gray)
             _faces2= _detector(_gray2)
-            print(_faces, _faces2) #this works so is able to find faces
             self.faces = _faces
             self.faces2 = _faces2
 
@@ -45,7 +44,6 @@ class CheckFaceLoc:
                 _facetop = _face.top()
                 _faceright = _face.right()
                 _facebottom = _face.bottom()
-                print(_faceleft)
                 cv2.rectangle(_frame1, (_faceleft, _facetop), (_faceright, _facebottom), (0, 255, 0), 3)
 
             for _face2 in _faces2:
@@ -63,11 +61,7 @@ class CheckFaceLoc:
             _closenessbottom = math.isclose(_facebottom, _facebottom2, abs_tol = 70)
 
             if _closenessleft == True and _closenesstop == True and _closenessright == True and _closenessbottom == True:
-                print("match") #replace this
                 _match = True
-
-
-
 
             else:
                 _match = False

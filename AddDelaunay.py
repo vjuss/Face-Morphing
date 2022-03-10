@@ -6,6 +6,13 @@ import numpy as np
 import dlib
 
 class AddDelaunay:
+    @staticmethod
+    def extract_index_nparray(nparray):
+        index = None
+        for num in nparray[0]:
+            index = num
+            break
+        return index
 
     def __init__(self, src_face, src_face2, frame, frame2):
         self.src_face = src_face
@@ -23,7 +30,8 @@ class AddDelaunay:
     def process(self):
         while not self.stopped:
 
-             #predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
+
+            _predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
             _frame = self.src_frame
             _frame2 = self.src_frame2
@@ -47,7 +55,7 @@ class AddDelaunay:
             #landmarks of first face
 
             for _face in _faces:
-                _landmarks = predictor(_gray, _face)
+                _landmarks = _predictor(_gray, _face)
                 _landmarks_points = []
                 for n in range(0, 68):
                     _x = _landmarks.part(n).x
@@ -78,13 +86,13 @@ class AddDelaunay:
                     _pt3 = (_t[4], _t[5])
 
                     _index_pt1 = np.where((_points == _pt1).all(axis=1))
-                    _index_pt1 = extract_index_nparray(_index_pt1)
+                    _index_pt1 = AddDelaunay.extract_index_nparray(_index_pt1)
 
                     _index_pt2 = np.where((_points == _pt2).all(axis=1))
-                    _index_pt2 = extract_index_nparray(_index_pt2)
+                    _index_pt2 = AddDelaunay.extract_index_nparray(_index_pt2)
 
                     _index_pt3 = np.where((_points == _pt3).all(axis=1))
-                    _index_pt3 = extract_index_nparray(_index_pt3)
+                    _index_pt3 = AddDelaunay.extract_index_nparray(_index_pt3)
                     
                     if _index_pt1 is not None and _index_pt2 is not None and _index_pt3 is not None:
                         _triangle = [_index_pt1, _index_pt2, _index_pt3]
@@ -92,7 +100,7 @@ class AddDelaunay:
 
             # Face 2
             for _face in _faces2:
-                _landmarks = predictor(_gray2, _face)
+                _landmarks = _predictor(_gray2, _face)
                 _landmarks_points2 = []
                 for n in range(0, 68):
                     _x = _landmarks.part(n).x

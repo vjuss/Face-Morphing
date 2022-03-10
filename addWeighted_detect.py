@@ -35,44 +35,12 @@ from AddDelaunay import AddDelaunay
 from VideoGet import VideoGet
 from CheckFaceLoc import CheckFaceLoc
 
-
-# Helper function for extracting index from array
-def extract_index_nparray(nparray):
-    index = None
-    for num in nparray[0]:
-        index = num
-        break
-    return index
-
-# Function for utilizing our threading class
-def threadVideoget(source=0):
-    video_getter = VideoGet(source).start()
-    #cps = CountsPerSec().start()
-
-    while True:
-        if (cv2.waitKey(1) == 27) or video_getter.stopped:
-            video_getter.stop()
-            break
-        #frame = video_getter.frame
-        #frame = putIterationsPerSec(frame, cps.countsPerSec())
-        #cv2.imshow("Video", frame)
-
-        if source==0:
-            frame=video_getter.frame  #fill frame with input
-            cv2.imshow("Video", frame)
-        if source==1:
-            frame2=video_getter.frame #fill frame2 with input
-            cv2.imshow("Video2", frame2)
-
-        #cps.increment()
-
-
 def main():
 
     video_capture = VideoGet(src=0).start()  #both 0 at uni laptop, 0 and 1 at home
-    video_capture2 = VideoGet(src=0).start()
+    video_capture2 = VideoGet(src=1).start()
 
-    video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2).start()
+    #video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2).start()
 
     #threadVideoget(0) #this is very quick as no processing in this thread. here as comparison for testing
     #threadVideoget(1) #
@@ -91,25 +59,28 @@ def main():
 
         frame = video_capture.frame
         frame2 = video_capture2.frame
+        inputs = np.concatenate((frame, frame2), axis=0)
+        cv2.imshow("Inputs", inputs) #showing input and detection
 
-        matchresult = video_process.match
+         #matchresult = video_process.match
 
-        if matchresult == True:
-            #these here temporarily 
-            pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
-            pastframes2.append(frame2) #
+        #if matchresult == True:
+            #print("faces match")
+        #     #these here temporarily 
+        #     pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
+        #     pastframes2.append(frame2) #
 
-            #its a match, use delaynay class with faces we alraedy have access to:
-            faces = video_process.faces  #frame, gray, detector already take place in this process 
-            faces2 = video_process.faces2 
+        #     #its a match, use delaynay class with faces we alraedy have access to:
+        #     faces = video_process.faces  #frame, gray, detector already take place in this process 
+        #     faces2 = video_process.faces2 
 
-             #CHECK whether this belongs in while loop OR OUTSIDE as start always incudes starting a while loop 
-            delaunay_process = AddDelaunay(faces, faces2, frame, frame2).start()
+        #      #CHECK whether this belongs in while loop OR OUTSIDE as start always incudes starting a while loop 
+        #     delaunay_process = AddDelaunay(faces, faces2, frame, frame2).start()
 
-            resultframe1 = delaunay_process.seamlessclone
-            resultframe2 = delaunay_process.seamlessclone2
-            frame3=resultframe1
-            frame4=resultframe2
+        #     resultframe1 = delaunay_process.seamlessclone
+        #     resultframe2 = delaunay_process.seamlessclone2
+        #     frame3=resultframe1
+        #     frame4=resultframe2
 
             #delanay effect neing used here, make this a class to avoid repetition
 
@@ -283,25 +254,21 @@ def main():
             # frame3 = seamlessclone
             # frame4 = seamlessclone2
         
-        else:
-            frame3= frame#placeholder, will show video from the room
-            frame4= frame2#placeholder, will show video from the room
+        # else:
+            # frame3= frame#placeholder, will show video from the room
+            # frame4= frame2#placeholder, will show video from the room
 
-        inputs = np.concatenate((frame, frame2), axis=0)
-
-        outputs = np.concatenate((frame3, frame4), axis=0)
-
-        cv2.imshow("Inputs", inputs) #showing input and detection
-        cv2.imshow("Result", outputs) #showing input and detection
+        #outputs = np.concatenate((frame3, frame4), axis=0)
+        #cv2.imshow("Result", outputs) #showing input and detection
 
         key = cv2.waitKey(1)
         if key == 27: #esc
             break
 
     # Release handle to the webcam
-    #video_capture.stop()
-    #video_capture2.stop()
-   # video_process.stop()
+    video_capture.stop()
+    video_capture2.stop()
+    video_process.stop()
 
     cv2.destroyAllWindows()
 
