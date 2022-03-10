@@ -24,7 +24,7 @@
 #sound
 # potentially add ml to generate nww faces
 # one helpful sourcve for threading has been https://github.com/jpark7ca/face_recognition/blob/master/face_recognition_webcam_mt.py
-# next up: make delanay into a thread and class, check the tutorial above for performance
+# next: make delanay into a thread and class, check the tutorial above for performance
 
 import cv2
 from cv2 import FLOODFILL_FIXED_RANGE
