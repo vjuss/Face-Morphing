@@ -7,29 +7,32 @@ import dlib
 
 class AddDelaunay:
 
-    def __init__(self, src_frame, src_frame2):
-        self.src_frame = src_frame
-        self.src_frame2 = src_frame2
+    def __init__(self, src_face, src_face2, frame, frame2):
+        self.src_face = src_face
+        self.src_face2 = src_face2
+        self.src_frame = frame
+        self.src_frame2 = frame2
         self.seamlessclone = ()
         self.seamlessclone2 = ()
+        self.stopped = False
 
     def start(self):    
-        Thread(target=self.get, args=()).start()
+        Thread(target=self.process, args=()).start()
         return self
 
     def process(self):
         while not self.stopped:
 
+             #predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
+
             _frame = self.src_frame
             _frame2 = self.src_frame2
 
-            _faces = video_process.faces #not sure if i can use video process here, does class currenlty havce access to it 
-            _faces2 = video_process.faces2
+            _faces = self.src_face
+            _faces2 = self.src_face2
 
             _gray = cv2.cvtColor(_frame, cv2.COLOR_BGR2GRAY)  #for example this is repetition
             _gray2 = cv2.cvtColor(_frame2, cv2.COLOR_BGR2GRAY)
-
-            
 
             _mask = np.zeros_like(_gray)
             _height, _width, _channels = _frame2.shape

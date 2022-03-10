@@ -30,10 +30,11 @@ class CheckFaceLoc:
             _gray2 = cv2.cvtColor(_frame2, cv2.COLOR_BGR2GRAY)
 
             #Find faces
-            detector = dlib.get_frontal_face_detector()
+            _detector = dlib.get_frontal_face_detector()
 
-            _faces= detector(_gray)
-            _faces2= detector(_gray2)
+            _faces= _detector(_gray)
+            _faces2= _detector(_gray2)
+            print(_faces, _faces2) #this works so is able to find faces
             self.faces = _faces
             self.faces2 = _faces2
 
@@ -44,6 +45,7 @@ class CheckFaceLoc:
                 _facetop = _face.top()
                 _faceright = _face.right()
                 _facebottom = _face.bottom()
+                print(_faceleft)
                 cv2.rectangle(_frame1, (_faceleft, _facetop), (_faceright, _facebottom), (0, 255, 0), 3)
 
             for _face2 in _faces2:
