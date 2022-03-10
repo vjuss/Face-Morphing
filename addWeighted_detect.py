@@ -72,13 +72,13 @@ def main():
             faces = video_process.faces  #frame, gray, detector already take place in this process 
             faces2 = video_process.faces2 
 
-               #CHECK whether this belongs in while loop OR OUTSIDE as start always incudes starting a while loop 
+            #This process is running fine and prints stuff at the end of its while loop, next step is to show the outputs
             delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = vidframe, frame2 = vidframe2, predictor = landmarkpredictor).start()
 
-        #     resultframe1 = delaunay_process.seamlessclone
-        #     resultframe2 = delaunay_process.seamlessclone2
-        #     frame3=resultframe1
-        #     frame4=resultframe2
+            resultframe1 = delaunay_process.seamlessclone
+            resultframe2 = delaunay_process.seamlessclone2
+            frame3=resultframe1
+            frame4=resultframe2
 
             #delanay effect neing used here, make this a class to avoid repetition
 
@@ -252,11 +252,11 @@ def main():
             # frame3 = seamlessclone
             # frame4 = seamlessclone2
         
-        # else:
-            # frame3= frame#placeholder, will show video from the room
-            # frame4= frame2#placeholder, will show video from the room
+        else:
+            frame3= vidframe #placeholder, will show video from the room
+            frame4= vidframe2 #placeholder, will show video from the room
 
-        #outputs = np.concatenate((frame3, frame4), axis=0)
+        #outputs = np.concatenate((frame3, frame4), axis=0) CURRENT ERROR COMES HERE
         #cv2.imshow("Result", outputs) #showing input and detection
 
         key = cv2.waitKey(1)
@@ -267,6 +267,7 @@ def main():
     video_capture.stop()
     video_capture2.stop()
     video_process.stop()
+    #delaunay_process.stop()
 
     cv2.destroyAllWindows()
 
