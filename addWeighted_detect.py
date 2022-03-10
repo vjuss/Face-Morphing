@@ -40,16 +40,14 @@ def main():
     video_capture = VideoGet(src=0).start()  #both 0 at uni laptop, 0 and 1 at home
     video_capture2 = VideoGet(src=1).start()
 
-    #video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2).start()
+    facedetector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
-    #threadVideoget(0) #this is very quick as no processing in this thread. here as comparison for testing
-    #threadVideoget(1) #
+    video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector).start()
 
     #for handling old sequences
     pastframes1 = list()
     pastframes2 = list()
-
-     #predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
     while True:
 
@@ -62,10 +60,10 @@ def main():
         inputs = np.concatenate((frame, frame2), axis=0)
         cv2.imshow("Inputs", inputs) #showing input and detection
 
-         #matchresult = video_process.match
+        matchresult = video_process.match
 
-        #if matchresult == True:
-            #print("faces match")
+        if matchresult == True:
+            print("faces match")
         #     #these here temporarily 
         #     pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
         #     pastframes2.append(frame2) #

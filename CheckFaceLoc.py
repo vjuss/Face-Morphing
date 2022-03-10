@@ -7,9 +7,10 @@ import math
         
 class CheckFaceLoc:
 
-    def __init__(self, capture1=None, capture2=None):
+    def __init__(self, capture1=None, capture2=None, detector=None):
         self.capture1 = capture1
         self.capture2 = capture2
+        self.detector = detector
         self.stopped = False
         self.match = False
         self.faces = ()
@@ -30,7 +31,7 @@ class CheckFaceLoc:
             _gray2 = cv2.cvtColor(_frame2, cv2.COLOR_BGR2GRAY)
 
             #Find faces
-            _detector = dlib.get_frontal_face_detector()
+            _detector = self.detector
 
             _faces= _detector(_gray)
             _faces2= _detector(_gray2)
