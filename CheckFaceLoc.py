@@ -55,7 +55,7 @@ class CheckFaceLoc:
 
             #Are they a match?
 
-            _closenessleft = math.isclose(_faceleft, _faceleft2, abs_tol = 70) #5 pixels
+            _closenessleft = math.isclose(_faceleft, _faceleft2, abs_tol = 70) 
             _closenesstop = math.isclose(_facetop, _facetop2, abs_tol = 70)
             _closenessright = math.isclose(_faceright, _faceright2, abs_tol = 70)
             _closenessbottom = math.isclose(_facebottom, _facebottom2, abs_tol = 70)
@@ -63,6 +63,10 @@ class CheckFaceLoc:
             if _closenessleft == True and _closenesstop == True and _closenessright == True and _closenessbottom == True:
                 print("match") #replace this
                 _match = True
+
+
+
+
             else:
                 _match = False
             

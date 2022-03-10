@@ -30,7 +30,6 @@ import cv2
 from cv2 import FLOODFILL_FIXED_RANGE
 import numpy as np
 import dlib
-from PIL import Image
 import math
 from VideoGet import VideoGet
 from CheckFaceLoc import CheckFaceLoc
@@ -69,7 +68,7 @@ def threadVideoget(source=0):
 
 def main():
 
-    video_capture = VideoGet(src=0).start()
+    video_capture = VideoGet(src=0).start()  #both 0 at uni laptop, 0 and 1 at home
     video_capture2 = VideoGet(src=1).start()
 
     video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2).start()
@@ -90,7 +89,7 @@ def main():
                 break
 
         matchresult = video_process.match
-        print(matchresult)
+        #print(matchresult)
 
         if matchresult == True:
             #its a match, do delanay
