@@ -14,11 +14,12 @@ class AddDelaunay:
             break
         return index
 
-    def __init__(self, src_face, src_face2, frame, frame2):
+    def __init__(self, src_face, src_face2, frame, frame2, predictor):
         self.src_face = src_face
         self.src_face2 = src_face2
         self.src_frame = frame
         self.src_frame2 = frame2
+        self.predictor = predictor
         self.seamlessclone = ()
         self.seamlessclone2 = ()
         self.stopped = False
@@ -31,8 +32,7 @@ class AddDelaunay:
         while not self.stopped:
 
 
-            _predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
-
+            _predictor = self.predictor
             _frame = self.src_frame
             _frame2 = self.src_frame2
 

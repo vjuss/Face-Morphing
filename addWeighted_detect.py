@@ -41,7 +41,7 @@ def main():
     video_capture2 = VideoGet(src=1).start()
 
     facedetector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("data/68_face_landmarks.dat")
+    landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
     video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector).start()
 
@@ -55,9 +55,9 @@ def main():
                 video_capture.stop()
                 break
 
-        frame = video_capture.frame
-        frame2 = video_capture2.frame
-        inputs = np.concatenate((frame, frame2), axis=0)
+        vidframe = video_capture.frame
+        vidframe2 = video_capture2.frame
+        inputs = np.concatenate((vidframe, vidframe2), axis=0)
         cv2.imshow("Inputs", inputs) #showing input and detection
 
         matchresult = video_process.match
@@ -68,12 +68,12 @@ def main():
         #     pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
         #     pastframes2.append(frame2) #
 
-        #     #its a match, use delaynay class with faces we alraedy have access to:
-        #     faces = video_process.faces  #frame, gray, detector already take place in this process 
-        #     faces2 = video_process.faces2 
+            #its a match, use delaynay class with faces we alraedy have access to:
+            faces = video_process.faces  #frame, gray, detector already take place in this process 
+            faces2 = video_process.faces2 
 
-        #      #CHECK whether this belongs in while loop OR OUTSIDE as start always incudes starting a while loop 
-        #     delaunay_process = AddDelaunay(faces, faces2, frame, frame2).start()
+               #CHECK whether this belongs in while loop OR OUTSIDE as start always incudes starting a while loop 
+            delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = vidframe, frame2 = vidframe2, predictor = landmarkpredictor).start()
 
         #     resultframe1 = delaunay_process.seamlessclone
         #     resultframe2 = delaunay_process.seamlessclone2
