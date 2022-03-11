@@ -37,8 +37,8 @@ from CheckFaceLoc import CheckFaceLoc
 
 def main():
 
-    video_capture = VideoGet(src=0).start()  #both 0 at uni laptop, 0 and 1 at home
-    video_capture2 = VideoGet(src=1).start()
+    video_capture = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
+    video_capture2 = VideoGet(src=2).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -248,7 +248,7 @@ def main():
 
         outputs = np.concatenate((frame3, frame4), axis=0) 
         cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
-
+        #error means that no frames are coming in 
         key = cv2.waitKey(1)
         if key == 27: #esc
             break
