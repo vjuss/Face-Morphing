@@ -44,8 +44,8 @@ def extract_index_nparray(nparray):
 
 def main():
 
-    video_capture = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
-    video_capture2 = VideoGet(src=1).start()
+    video_capture2 = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
+    video_capture = VideoGet(src=1).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -65,16 +65,16 @@ def main():
         faces = video_process.faces 
         faces2 = video_process.faces2 
 
-        # if len(faces)==1 and len(faces2)==1:  #if both webcams detect one face, flip views
-        #     vidframe = video_capture2.frame
-        #     vidframe2 = video_capture.frame
+        if len(faces)==1 and len(faces2)==1:  #if both webcams detect one face, flip views
+             vidframe = video_capture2.frame
+             vidframe2 = video_capture.frame
 
-        # else:
-        #     vidframe = video_capture.frame
-        #     vidframe2 = video_capture2.frame
+        else:
+             vidframe = video_capture.frame
+             vidframe2 = video_capture2.frame
 
-        vidframe = video_capture.frame
-        vidframe2 = video_capture2.frame
+        #vidframe = video_capture.frame
+        #vidframe2 = video_capture2.frame
 
         matchresult = video_process.match
         if matchresult == True:
