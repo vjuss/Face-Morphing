@@ -34,6 +34,7 @@ import math
 from AddDelaunay import AddDelaunay
 from VideoGet import VideoGet
 from CheckFaceLoc import CheckFaceLoc
+import random
 
 def extract_index_nparray(nparray):
         index = None
@@ -79,9 +80,13 @@ def main():
         matchresult = video_process.match
         if matchresult == True:
             print("faces match")
-        #     #these here temporarily 
-        #     pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
-        #     pastframes2.append(frame2) #
+            pastframes1.append(vidframe) # storing ghost images to be used later
+            pastframes2.append(vidframe2) #
+            print(len(pastframes1))
+            print(len(pastframes2))
+
+            if len(pastframes1) > 20: #testing ghost images
+                vidframe = (random.choice(pastframes1))
 
             #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
             #delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = video_process.frame, frame2 = video_process.frame2, predictor = landmarkpredictor).start()
