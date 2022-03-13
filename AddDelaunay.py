@@ -202,7 +202,7 @@ class AddDelaunay:
 
             self.seamlessclone = _seamlessclone  #these will give results in the main function
             self.seamlessclone2 = _seamlessclone2
-            #print("clone done") this runs as a whole as clonedone is being printed
+            print("clone done") #this runs as a whole as clonedone is being printed
 
 
     def stop(self):

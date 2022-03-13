@@ -50,7 +50,7 @@ def main():
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
-    video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector).start()
+    video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
 
     #for handling old sequences
     pastframes1 = list()
@@ -64,9 +64,6 @@ def main():
 
         vidframe = video_capture.frame
         vidframe2 = video_capture2.frame
-        inputs = np.concatenate((vidframe, vidframe2), axis=0)
-        cv2.imshow("Inputs", inputs) #showing input and detection
-
         matchresult = video_process.match
 
         if matchresult == True:
@@ -80,11 +77,9 @@ def main():
             faces2 = video_process.faces2 
 
             #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
-            #delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = vidframe, frame2 = vidframe2, predictor = landmarkpredictor).start()
+            #delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = video_process.frame, frame2 = video_process.frame2, predictor = landmarkpredictor).start()
             #frame3 = delaunay_process.seamlessclone
             #frame4 = delaunay_process.seamlessclone2
-
-            #delanay effect neing used here, make this a class to avoid repetition
 
             gray = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY)  #for example this is repetition
             gray2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
@@ -260,7 +255,7 @@ def main():
         
         outputs = np.concatenate((frame3, frame4), axis=0) 
         cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
-        #error means that no frames are coming in 
+
         key = cv2.waitKey(1)
         if key == 27: #esc
             break

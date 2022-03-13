@@ -2,19 +2,25 @@ from threading import Thread
 import cv2
 import dlib
 import math
+import numpy as np
 
 #class will check a) if there are faces b) face coords of two frames c) returns a yes if they match
         
 class CheckFaceLoc:
 
-    def __init__(self, capture1=None, capture2=None, detector=None):
+    def __init__(self, capture1=None, capture2=None, detector=None, predictor=None):
         self.capture1 = capture1
         self.capture2 = capture2
         self.detector = detector
+        self.predictor = predictor
         self.stopped = False
         self.match = False
         self.faces = ()
         self.faces2 = ()
+        self.frame = None
+        self.frame2 = None
+        self.seamlessclone = None
+        self.seamlessclone2 = None
 
     def start(self):
         Thread(target=self.process, args=()).start()
@@ -25,6 +31,8 @@ class CheckFaceLoc:
             # Grab frames from live video streams
             _frame1 = self.capture1.read()
             _frame2 = self.capture2.read()
+            self.frame = _frame1
+            self.frame2 = _frame2
 
             # Make thme black and white for analysis
             _gray = cv2.cvtColor(_frame1, cv2.COLOR_BGR2GRAY)
