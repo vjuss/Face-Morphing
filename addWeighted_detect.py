@@ -62,27 +62,34 @@ def main():
                 video_capture.stop()
                 break
 
+        faces = video_process.faces 
+        faces2 = video_process.faces2 
+
+        # if len(faces)==1 and len(faces2)==1:  #if both webcams detect one face, flip views
+        #     vidframe = video_capture2.frame
+        #     vidframe2 = video_capture.frame
+
+        # else:
+        #     vidframe = video_capture.frame
+        #     vidframe2 = video_capture2.frame
+
         vidframe = video_capture.frame
         vidframe2 = video_capture2.frame
-        matchresult = video_process.match
 
+        matchresult = video_process.match
         if matchresult == True:
             print("faces match")
         #     #these here temporarily 
         #     pastframes1.append(frame) #sequence of raw images, can be 100 for example. frame is the realtime image
         #     pastframes2.append(frame2) #
 
-            #its a match, use delaynay class with faces we alraedy have access to:
-            faces = video_process.faces  #frame, gray, detector already take place in this process 
-            faces2 = video_process.faces2 
-
             #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
             #delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = video_process.frame, frame2 = video_process.frame2, predictor = landmarkpredictor).start()
             #frame3 = delaunay_process.seamlessclone
-            #frame4 = delaunay_process.seamlessclone2
+            #frame4 = delaunay_process.seamlessclone
 
-            gray = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY)  #for example this is repetition
-            gray2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            gray2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
             mask = np.zeros_like(gray)
             height, width, channels = vidframe2.shape
@@ -250,8 +257,9 @@ def main():
 
         
         else:
-            frame3= vidframe #placeholder, will show video from the room
-            frame4= vidframe2 #placeholder, will show video from the room
+
+            frame3 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            frame4 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
         
         outputs = np.concatenate((frame3, frame4), axis=0) 
         cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
