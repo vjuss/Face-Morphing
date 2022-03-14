@@ -46,7 +46,7 @@ def extract_index_nparray(nparray):
 def main():
 
     video_capture2 = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=1).start()
+    video_capture = VideoGet(src=2).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -85,8 +85,16 @@ def main():
             print(len(pastframes1))
             print(len(pastframes2))
 
-            if len(pastframes1) > 20: #testing ghost images
+            if len(pastframes1) > 20 and len(pastframes1) < 30: #testing ghost images on one
                 vidframe = (random.choice(pastframes1))
+
+            if len(pastframes1) > 30 and len(pastframes1) < 40: #testing ghost images on both
+                vidframe = (random.choice(pastframes1))
+                vidframe2 = (random.choice(pastframes2))
+
+            if len(pastframes1) > 40 and len(pastframes1) < 60: #delanay bridges same person in diff time. maybe go through all the stored frames backwards
+                vidframe = (random.choice(pastframes1))
+                vidframe2 = video_capture.frame
 
             #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
             #delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = video_process.frame, frame2 = video_process.frame2, predictor = landmarkpredictor).start()
