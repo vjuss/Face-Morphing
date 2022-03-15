@@ -48,6 +48,8 @@ def main():
     video_capture2 = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
     video_capture = VideoGet(src=2).start()
 
+    two_faces = False
+
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
@@ -67,10 +69,12 @@ def main():
         faces2 = video_process.faces2 
 
         if len(faces)==1 and len(faces2)==1:  #if both webcams detect one face, flip views
+             two_faces = True
              vidframe = video_capture2.frame
              vidframe2 = video_capture.frame
 
         else:
+             two_faces = False
              vidframe = video_capture.frame
              vidframe2 = video_capture2.frame
 
