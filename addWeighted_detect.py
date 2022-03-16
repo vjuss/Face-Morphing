@@ -49,8 +49,6 @@ def main():
     video_capture2 = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
     video_capture = VideoGet(src=2).start()
 
-    two_faces = False
-
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
     
@@ -61,27 +59,30 @@ def main():
     pastframes1 = list()
     pastframes2 = list()
 
+    matchresult = False # placeholder when starting
+
+
     while True:
 
         if video_capture.stopped:
                 video_capture.stop()
                 break
 
-        # if len(faces)==1 and len(faces2)==1:  #if both webcams detect one face, flip views
-        #      two_faces = True
-        #      vidframe = video_capture2.frame
-        #      vidframe2 = video_capture.frame
-
-        # else:
-        #      two_faces = False
-        #      vidframe = video_capture.frame
-        #      vidframe2 = video_capture2.frame
-
         vidframe = video_capture.frame
         vidframe2 = video_capture2.frame
 
+        two_faces = video_process.twofaces #checks if true or false 
 
-        matchresult = video_process.match
+        if two_faces == True:
+            #vidframe = video_capture2.frame
+            #vidframe2 = video_capture.frame
+            #FLIPPING AND EYE / MATCH DETETCTUON WILL HAPPEN IN THIS CASE
+            matchresult = video_process.match # check if faces or eyes match - make thi into a function or class
+
+        else:
+            #idframe = video_capture.frame
+            #vidframe2 = video_capture2.frame
+            matchresult = False
 
         if matchresult == True:
             print("faces match")

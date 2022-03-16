@@ -17,6 +17,7 @@ class CheckFaceLoc:
         self.match = False
         self.faces = ()
         self.faces2 = ()
+        self.twofaces = False
         self.frame = None
         self.frame2 = None
         self.seamlessclone = None
@@ -45,6 +46,12 @@ class CheckFaceLoc:
             _faces2= _detector(_gray2)
             self.faces = _faces
             self.faces2 = _faces2
+            
+            if len(_faces) == 1 and len(_faces2) == 1:
+                self.twofaces = True
+            else:
+                self.twofaces = False
+
 
             #Find face coords
 
