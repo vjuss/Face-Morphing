@@ -60,6 +60,7 @@ class CheckFaceLoc:
                 _facetop2 = _face2.top()
                 _faceright2 = _face2.right()
                 _facebottom2 = _face2.bottom()
+                print("faceleft debugging")
                 cv2.rectangle(_frame2, (_faceleft2, _facetop2), (_faceright2, _facebottom2), (0, 255, 0), 3)
 
             #Are they a match?
