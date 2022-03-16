@@ -14,10 +14,6 @@ class CheckFaces:
         self.detector = detector
         self.stopped = False
         self.twofaces = False
-        self.faces = ()
-        self.faces2 = ()
-        self.frame = None
-        self.frame2 = None
 
     def start(self):
         Thread(target=self.process, args=()).start()
@@ -28,8 +24,6 @@ class CheckFaces:
             # Grab frames from live video streams
             _frame1 = self.capture1.read()
             _frame2 = self.capture2.read()
-            self.frame = _frame1
-            self.frame2 = _frame2
 
             # Make thme black and white for analysis
             _gray = cv2.cvtColor(_frame1, cv2.COLOR_BGR2GRAY)

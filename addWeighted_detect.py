@@ -34,6 +34,7 @@ import math
 from AddDelaunay import AddDelaunay
 from VideoGet import VideoGet
 from CheckFaceLoc import CheckFaceLoc
+from CheckFaces import CheckFaces
 import random
 
 def extract_index_nparray(nparray):
@@ -53,6 +54,8 @@ def main():
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
 
+    
+     #facecheck_process = CheckFaces(capture1 = video_capture, capture2=video_capture2, detector=facedetector).start()
     video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
 
     #for handling old sequences
@@ -65,21 +68,25 @@ def main():
                 video_capture.stop()
                 break
 
+         #twofaces = facecheck_process.twofaces
+         #print(two_faces)
         faces = video_process.faces 
         faces2 = video_process.faces2 
 
-        if len(faces)==1 and len(faces2)==1:  #if both webcams detect one face, flip views
-             two_faces = True
-             vidframe = video_capture2.frame
-             vidframe2 = video_capture.frame
+        # if len(faces)==1 and len(faces2)==1:  #if both webcams detect one face, flip views
+        #      two_faces = True
+        #      vidframe = video_capture2.frame
+        #      vidframe2 = video_capture.frame
 
-        else:
-             two_faces = False
-             vidframe = video_capture.frame
-             vidframe2 = video_capture2.frame
+        # else:
+        #      two_faces = False
+        #      vidframe = video_capture.frame
+        #      vidframe2 = video_capture2.frame
 
-        #vidframe = video_capture.frame
-        #vidframe2 = video_capture2.frame
+        vidframe = video_capture.frame
+        vidframe2 = video_capture2.frame
+
+        
 
         matchresult = video_process.match
         if matchresult == True:
