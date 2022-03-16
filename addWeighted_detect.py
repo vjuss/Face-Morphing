@@ -39,6 +39,16 @@ import random
 import threading
 import time
 
+def countdown():
+    global my_timer
+    my_timer = 0
+
+    for x in range(10):
+        my_timer = my_timer + 1
+        print(my_timer)
+        sleep(1)
+
+    print("10 seconds up")
 
 def extract_index_nparray(nparray):
         index = None
@@ -50,7 +60,7 @@ def extract_index_nparray(nparray):
 def main():
 
     video_capture2 = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=2).start()
+    video_capture = VideoGet(src=1).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -58,15 +68,18 @@ def main():
     video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
     #FIX THIS SO THAT YOU ONLY USE CERATIN PROPERTIES FROM SAME VIDOE PROCESS CLASS. CREATE FUNCTIONS THERE
 
+    
+
     #for handling old sequences
     pastframes1 = list()
     pastframes2 = list()
 
     matchresult = False # placeholder when starting
 
+    start = time.time()
+
 
     while True:
-
         if video_capture.stopped:
                 video_capture.stop()
                 break
@@ -88,7 +101,11 @@ def main():
 
         if matchresult == True:
             print("faces match")
-
+            matchtime = time.time() - start 
+            print(matchtime)  #this number grows every time loop is run
+            currenttime = time.time() -matchtime - start
+            print(currenttime)
+           
             pastframes1.append(vidframe) # storing ghost images to be used later
             pastframes2.append(vidframe2) #
         
@@ -112,9 +129,9 @@ def main():
 
 
             #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
-            delaunay_process = AddDelaunay(frame = vidframe, frame2 = vidframe2, detector=facedetector, predictor = landmarkpredictor).start()
-            #frame3 = delaunay_process.seamlessclone
-            #frame4 = delaunay_process.seamlessclone
+             #delaunay_process = AddDelaunay(frame = vidframe, frame2 = vidframe2, detector=facedetector, predictor = landmarkpredictor).start()
+             #resultframe = delaunay_process.seamlessclone
+             #resultframe2 = delaunay_process.seamlessclone2
 
             faces = video_process.faces 
             faces2 = video_process.faces2 
@@ -281,8 +298,6 @@ def main():
             seamlessclone2 = cv2.cvtColor(seamlessclone2, cv2.COLOR_BGR2GRAY)
             #cv2.imshow("result", seamlessclone) #
 
-            #frame3 = delaunay_process.seamlessclone
-            #frame4 = delaunay_process.seamlessclone2
             resultframe = seamlessclone
             resultframe2 = seamlessclone2
 
@@ -295,7 +310,6 @@ def main():
         cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
 
         key = cv2.waitKey(1)
-
         if key == 27: #esc
             break
 

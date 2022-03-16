@@ -19,8 +19,8 @@ class AddDelaunay:
         self.src_frame2 = frame2
         self.detector = detector
         self.predictor = predictor
-        #self.seamlessclone = () CHEKC FORMAT 
-        #self.seamlessclone2 = ()
+        self.seamlessclone = [] 
+        self.seamlessclone2 = []
         self.stopped = False
 
     def start(self):    
@@ -202,17 +202,8 @@ class AddDelaunay:
             _seamlessclone2 = cv2.seamlessClone(_result2, _frame2, _img2_head_mask2, _center_face2, cv2.NORMAL_CLONE)
             _seamlessclone2 = cv2.cvtColor(_seamlessclone2, cv2.COLOR_BGR2GRAY)
 
-            #self.seamlessclone = _seamlessclone  #these will give results in the main function
-            #self.seamlessclone2 = _seamlessclone2
-            print("clone done") #this runs as a whole as clonedone is being printed
-            print(_seamlessclone) #prints result like: [[210 210 210 ...  10  10  10]
-                # [210 210 210 ...  10  10  10]
-                # [210 210 209 ...  10  10  10]
-                # ...
-                # [186 189 192 ...   0   0   0]
-                # [186 189 191 ...   0   0   0]
-                # [186 188 189 ...   0   0   0]]
-
+            self.seamlessclone = _seamlessclone  #these will give results in the main function
+            self.seamlessclone2 = _seamlessclone2
 
     def stop(self):
          self.stopped = True

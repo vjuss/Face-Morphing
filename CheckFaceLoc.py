@@ -20,8 +20,7 @@ class CheckFaceLoc:
         self.twofaces = False
         self.frame = None
         self.frame2 = None
-        self.seamlessclone = None
-        self.seamlessclone2 = None
+
 
     def start(self):
         Thread(target=self.process, args=()).start()
@@ -41,6 +40,7 @@ class CheckFaceLoc:
 
             #Find faces
             _detector = self.detector
+            _predictor = self.predictor
 
             _faces= _detector(_gray)
             _faces2= _detector(_gray2)
@@ -60,6 +60,9 @@ class CheckFaceLoc:
                 _facetop = _face.top()
                 _faceright = _face.right()
                 _facebottom = _face.bottom()
+
+                _landmarks = _predictor(_gray, _face)
+              
                 #cv2.rectangle(_frame1, (_faceleft, _facetop), (_faceright, _facebottom), (0, 255, 0), 3)
 
             for _face2 in _faces2:
@@ -67,6 +70,9 @@ class CheckFaceLoc:
                 _facetop2 = _face2.top()
                 _faceright2 = _face2.right()
                 _facebottom2 = _face2.bottom()
+
+                _landmarks2 = _predictor(_gray2, _face2)
+
                 #print("faceleft debugging")
                 #cv2.rectangle(_frame2, (_faceleft2, _facetop2), (_faceright2, _facebottom2), (0, 255, 0), 3)
 
@@ -84,6 +90,7 @@ class CheckFaceLoc:
                 _match = False
             
             self.match = _match
+
 
     def stop(self):
          self.stopped = True
