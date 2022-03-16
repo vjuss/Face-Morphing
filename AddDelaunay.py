@@ -14,14 +14,13 @@ class AddDelaunay:
             break
         return index
 
-    def __init__(self, src_face, src_face2, frame, frame2, predictor):
-        self.src_face = src_face
-        self.src_face2 = src_face2
+    def __init__(self, frame, frame2, detector, predictor):
         self.src_frame = frame
         self.src_frame2 = frame2
+        self.detector = detector
         self.predictor = predictor
-        self.seamlessclone = ()
-        self.seamlessclone2 = ()
+        #self.seamlessclone = () CHEKC FORMAT 
+        #self.seamlessclone2 = ()
         self.stopped = False
 
     def start(self):    
@@ -30,17 +29,20 @@ class AddDelaunay:
 
     def process(self):
         while not self.stopped:
-
-
-            _predictor = self.predictor
+           
             _frame = self.src_frame
             _frame2 = self.src_frame2
 
-            _faces = self.src_face
-            _faces2 = self.src_face2
-
             _gray = cv2.cvtColor(_frame, cv2.COLOR_BGR2GRAY)  #for example this is repetition
             _gray2 = cv2.cvtColor(_frame2, cv2.COLOR_BGR2GRAY)
+
+              #Find faces
+            _detector = self.detector
+            _predictor = self.predictor
+
+        
+            _faces= _detector(_gray)
+            _faces2= _detector(_gray2)
 
             _mask = np.zeros_like(_gray)
             _height, _width, _channels = _frame2.shape
@@ -200,9 +202,16 @@ class AddDelaunay:
             _seamlessclone2 = cv2.seamlessClone(_result2, _frame2, _img2_head_mask2, _center_face2, cv2.NORMAL_CLONE)
             _seamlessclone2 = cv2.cvtColor(_seamlessclone2, cv2.COLOR_BGR2GRAY)
 
-            self.seamlessclone = _seamlessclone  #these will give results in the main function
-            self.seamlessclone2 = _seamlessclone2
+            #self.seamlessclone = _seamlessclone  #these will give results in the main function
+            #self.seamlessclone2 = _seamlessclone2
             print("clone done") #this runs as a whole as clonedone is being printed
+            print(_seamlessclone) #prints result like: [[210 210 210 ...  10  10  10]
+                # [210 210 210 ...  10  10  10]
+                # [210 210 209 ...  10  10  10]
+                # ...
+                # [186 189 192 ...   0   0   0]
+                # [186 189 191 ...   0   0   0]
+                # [186 188 189 ...   0   0   0]]
 
 
     def stop(self):

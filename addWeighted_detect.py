@@ -36,6 +36,9 @@ from VideoGet import VideoGet
 from CheckFaceLoc import CheckFaceLoc
 from CheckFaces import CheckFaces
 import random
+import threading
+import time
+
 
 def extract_index_nparray(nparray):
         index = None
@@ -78,7 +81,6 @@ def main():
             #vidframe2 = video_capture.frame
             #FLIPPING AND EYE / MATCH DETETCTUON WILL HAPPEN IN THIS CASE
             matchresult = video_process.match # check if faces or eyes match - make thi into a function or class
-
         else:
             #idframe = video_capture.frame
             #vidframe2 = video_capture2.frame
@@ -86,14 +88,16 @@ def main():
 
         if matchresult == True:
             print("faces match")
-            faces = video_process.faces 
-            faces2 = video_process.faces2 
 
             pastframes1.append(vidframe) # storing ghost images to be used later
             pastframes2.append(vidframe2) #
+        
+            #WE WANT TO TRIGGER TIMER 
+            #IF TIMER LESS THEN 20S, USE DELAUNAY EFFECT 1
+            #IF TIMER BETWEEN 20S AND 40S, USE DELAUNAY EFFECT 2
+            #IF TIMER BETWEEN 40-60S, USE DELAUNAY EFFECT 3 
 
-            print(len(pastframes1))
-            print(len(pastframes2))
+            #these if statements are to be replaced with  a timer and diff delaunay functions / classes
 
             if len(pastframes1) > 20 and len(pastframes1) < 30: #testing ghost images on one
                 vidframe = (random.choice(pastframes1))
@@ -106,10 +110,14 @@ def main():
                 vidframe = (random.choice(pastframes1))
                 vidframe2 = video_capture.frame
 
+
             #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
-            #delaunay_process = AddDelaunay(src_face = faces, src_face2 = faces2, frame = video_process.frame, frame2 = video_process.frame2, predictor = landmarkpredictor).start()
+            delaunay_process = AddDelaunay(frame = vidframe, frame2 = vidframe2, detector=facedetector, predictor = landmarkpredictor).start()
             #frame3 = delaunay_process.seamlessclone
             #frame4 = delaunay_process.seamlessclone
+
+            faces = video_process.faces 
+            faces2 = video_process.faces2 
 
             gray = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
             gray2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 

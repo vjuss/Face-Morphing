@@ -60,15 +60,15 @@ class CheckFaceLoc:
                 _facetop = _face.top()
                 _faceright = _face.right()
                 _facebottom = _face.bottom()
-                cv2.rectangle(_frame1, (_faceleft, _facetop), (_faceright, _facebottom), (0, 255, 0), 3)
+                #cv2.rectangle(_frame1, (_faceleft, _facetop), (_faceright, _facebottom), (0, 255, 0), 3)
 
             for _face2 in _faces2:
                 _faceleft2 = _face2.left()
                 _facetop2 = _face2.top()
                 _faceright2 = _face2.right()
                 _facebottom2 = _face2.bottom()
-                print("faceleft debugging")
-                cv2.rectangle(_frame2, (_faceleft2, _facetop2), (_faceright2, _facebottom2), (0, 255, 0), 3)
+                #print("faceleft debugging")
+                #cv2.rectangle(_frame2, (_faceleft2, _facetop2), (_faceright2, _facebottom2), (0, 255, 0), 3)
 
             #Are they a match?
 
