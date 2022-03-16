@@ -53,10 +53,9 @@ def main():
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
-
     
-     #facecheck_process = CheckFaces(capture1 = video_capture, capture2=video_capture2, detector=facedetector).start()
     video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
+    #FIX THIS SO THAT YOU ONLY USE CERATIN PROPERTIES FROM SAME VIDOE PROCESS CLASS. CREATE FUNCTIONS THERE
 
     #for handling old sequences
     pastframes1 = list()
@@ -67,11 +66,6 @@ def main():
         if video_capture.stopped:
                 video_capture.stop()
                 break
-
-         #twofaces = facecheck_process.twofaces
-         #print(two_faces)
-        faces = video_process.faces 
-        faces2 = video_process.faces2 
 
         # if len(faces)==1 and len(faces2)==1:  #if both webcams detect one face, flip views
         #      two_faces = True
@@ -86,13 +80,17 @@ def main():
         vidframe = video_capture.frame
         vidframe2 = video_capture2.frame
 
-        
 
         matchresult = video_process.match
+
         if matchresult == True:
             print("faces match")
+            faces = video_process.faces 
+            faces2 = video_process.faces2 
+
             pastframes1.append(vidframe) # storing ghost images to be used later
             pastframes2.append(vidframe2) #
+
             print(len(pastframes1))
             print(len(pastframes2))
 
@@ -276,19 +274,19 @@ def main():
 
             #frame3 = delaunay_process.seamlessclone
             #frame4 = delaunay_process.seamlessclone2
-            frame3 = seamlessclone
-            frame4 = seamlessclone2
+            resultframe = seamlessclone
+            resultframe2 = seamlessclone2
 
-        
         else:
+            resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
-            frame3 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
-            frame4 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
-        
-        outputs = np.concatenate((frame3, frame4), axis=0) 
+ 
+        outputs = np.concatenate((resultframe, resultframe2), axis=0) 
         cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
 
         key = cv2.waitKey(1)
+
         if key == 27: #esc
             break
 
