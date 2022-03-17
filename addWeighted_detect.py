@@ -71,8 +71,6 @@ def main():
     video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
     #FIX THIS SO THAT YOU ONLY USE CERATIN PROPERTIES FROM SAME VIDOE PROCESS CLASS. CREATE FUNCTIONS THERE
 
-    
-
     #for handling old sequences
     pastframes1 = list()
     pastframes2 = list()
@@ -136,26 +134,31 @@ def main():
              #resultframe = delaunay_process.seamlessclone
              #resultframe2 = delaunay_process.seamlessclone2
 
-            faces = video_process.faces 
-            faces2 = video_process.faces2 
+            #gray = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            #gray2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
-            gray = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
-            gray2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+            gray = cv2.cvtColor(video_process.frame, cv2.COLOR_BGR2GRAY) 
+            gray2 = cv2.cvtColor(video_process.frame2, cv2.COLOR_BGR2GRAY) 
 
             mask = np.zeros_like(gray)
-            height, width, channels = vidframe2.shape
+            height, width, channels = video_process.frame2.shape #was vidframe2
             img2_new_face = np.zeros((height, width, channels), np.uint8)
             indexes_triangles = []
 
             mask2 = np.zeros_like(gray2)
-            height2, width2, channels2 = vidframe.shape
+            height2, width2, channels2 = video_process.frame.shape #change all vidframes to vid process frameiksi to test
             img1_new_face = np.zeros((height2, width2, channels2), np.uint8)
             indexes_triangles2 = []
 
             #landmarks of first face
 
+            faces = video_process.faces 
+            faces2 = video_process.faces2 
+
+
+
             for face in faces:
-                landmarks = landmarkpredictor(gray, face)
+                landmarks = video_process.landmarks
                 landmarks_points = []
                 for n in range(0, 68):
                     x = landmarks.part(n).x
@@ -167,7 +170,7 @@ def main():
                 convexhull = cv2.convexHull(points)
                 cv2.fillConvexPoly(mask, convexhull, 255)    
                 
-                face_image_1 = cv2.bitwise_and(vidframe, vidframe, mask=mask)
+                face_image_1 = cv2.bitwise_and(video_process.frame, video_process.frame, mask=mask)
         
 
                 # Delaunay triangulation
@@ -200,23 +203,23 @@ def main():
 
             # Face 2
             for face in faces2:
-                landmarks = landmarkpredictor(gray2, face)
+                landmarks2 = video_process.landmarks2
                 landmarks_points2 = []
                 for n in range(0, 68):
-                    x = landmarks.part(n).x
-                    y = landmarks.part(n).y
+                    x = landmarks2.part(n).x
+                    y = landmarks2.part(n).y
                     landmarks_points2.append((x, y))
 
 
                 points2 = np.array(landmarks_points2, np.int32)
                 convexhull2 = cv2.convexHull(points2)
                 cv2.fillConvexPoly(mask2, convexhull2, 255)  
-                face_image_2 = cv2.bitwise_and(vidframe2, vidframe2, mask=mask2)
+                face_image_2 = cv2.bitwise_and(video_process.frame2, video_process.frame2, mask=mask2)
 
 
             # Creating empty mask
             lines_space_mask = np.zeros_like(gray)
-            lines_space_new_face = np.zeros_like(vidframe2)
+            lines_space_new_face = np.zeros_like(video_process.frame2)
 
             # Triangulation of both faces
             for triangle_index in indexes_triangles:
@@ -229,7 +232,7 @@ def main():
 
                 rect1 = cv2.boundingRect(triangle1)
                 (x, y, w, h) = rect1
-                cropped_triangle = vidframe[y: y + h, x: x + w]
+                cropped_triangle = video_process.frame[y: y + h, x: x + w]
                 cropped_tr1_mask = np.zeros((h, w), np.uint8)
 
 
@@ -243,7 +246,7 @@ def main():
                 cv2.line(lines_space_mask, tr1_pt1, tr1_pt2, 255)
                 cv2.line(lines_space_mask, tr1_pt2, tr1_pt3, 255)
                 cv2.line(lines_space_mask, tr1_pt1, tr1_pt3, 255)
-                lines_space = cv2.bitwise_and(vidframe, vidframe, mask=lines_space_mask)
+                lines_space = cv2.bitwise_and(video_process.frame, video_process.frame, mask=lines_space_mask)
 
                 # Triangulation of second face
                 tr2_pt1 = landmarks_points2[triangle_index[0]]
@@ -286,18 +289,18 @@ def main():
             img2_face_mask = cv2.bitwise_not(img2_head_mask)
             img2_face_mask2 = cv2.bitwise_not(img2_head_mask2)
 
-            img2_head_noface = cv2.bitwise_and(vidframe2, vidframe2, mask=img2_face_mask)
-            img2_head_noface2 = cv2.bitwise_and(vidframe2, vidframe2, mask=img2_face_mask2)
+            img2_head_noface = cv2.bitwise_and(video_process.frame2, video_process.frame2, mask=img2_face_mask)
+            img2_head_noface2 = cv2.bitwise_and(video_process.frame2, video_process.frame2, mask=img2_face_mask2)
             result = cv2.add(img2_head_noface, img2_new_face)
             result2 = cv2.add(img2_head_noface2, img2_new_face)
 
             # Creating seamless clone of two faces
             (x, y, w, h) = cv2.boundingRect(convexhull2)
             center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
-            seamlessclone = cv2.seamlessClone(result, vidframe2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
+            seamlessclone = cv2.seamlessClone(result, video_process.frame2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
             seamlessclone = cv2.cvtColor(seamlessclone, cv2.COLOR_BGR2GRAY)
 
-            seamlessclone2 = cv2.seamlessClone(result2, vidframe2, img2_head_mask2, center_face2, cv2.NORMAL_CLONE)
+            seamlessclone2 = cv2.seamlessClone(result2, video_process.frame2, img2_head_mask2, center_face2, cv2.NORMAL_CLONE)
             seamlessclone2 = cv2.cvtColor(seamlessclone2, cv2.COLOR_BGR2GRAY)
             #cv2.imshow("result", seamlessclone) #
 
