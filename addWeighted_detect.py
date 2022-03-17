@@ -155,8 +155,6 @@ def main():
             faces = video_process.faces 
             faces2 = video_process.faces2 
 
-
-
             for face in faces:
                 landmarks = video_process.landmarks
                 landmarks_points = []
