@@ -20,6 +20,11 @@ class CheckFaceLoc:
         self.twofaces = False
         self.frame = None
         self.frame2 = None
+        self.leftpupils = ()
+        self.rightpupils = ()
+        self.leftpupils2 = ()
+        self.rightpupils2 = ()
+
 
 
     def start(self):
@@ -62,6 +67,19 @@ class CheckFaceLoc:
                 _facebottom = _face.bottom()
 
                 _landmarks = _predictor(_gray, _face)
+                _pupil_x = int((abs(_landmarks.part(39).x + _landmarks.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
+                _pupil_y = int((abs(_landmarks.part(39).y + _landmarks.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                _pupil_coordination = (_pupil_x, _pupil_y)
+                self.leftpupils = _pupil_coordination
+
+                _rpupil_x = int((abs(_landmarks.part(46).x + _landmarks.part(44).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
+                _rpupil_y = int((abs(_landmarks.part(46).y + _landmarks.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                _rpupil_coordination = (_rpupil_x, _rpupil_y)
+                self.rightpupils = _rpupil_coordination
+
+
+
+
               
                 #cv2.rectangle(_frame1, (_faceleft, _facetop), (_faceright, _facebottom), (0, 255, 0), 3)
 
@@ -72,6 +90,16 @@ class CheckFaceLoc:
                 _facebottom2 = _face2.bottom()
 
                 _landmarks2 = _predictor(_gray2, _face2)
+                _pupil_x2 = int((abs(_landmarks2.part(39).x + _landmarks2.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
+                _pupil_y2 = int((abs(_landmarks2.part(39).y + _landmarks2.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                _pupil_coordination2 = (_pupil_x2, _pupil_y2)
+                self.leftpupils2 = _pupil_coordination2
+
+
+                _rpupil_x2 = int((abs(_landmarks2.part(46).x + _landmarks2.part(44).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
+                _rpupil_y2 = int((abs(_landmarks2.part(46).y + _landmarks2.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                _rpupil_coordination2 = (_rpupil_x2, _rpupil_y2)
+                self.rightpupils2 = _rpupil_coordination2
 
                 #print("faceleft debugging")
                 #cv2.rectangle(_frame2, (_faceleft2, _facetop2), (_faceright2, _facebottom2), (0, 255, 0), 3)

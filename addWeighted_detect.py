@@ -25,6 +25,9 @@
 # potentially add GAN to generate nww faces. CAN ALSO REPLACE DELANAY OIN THIS CODE
 # one helpful sourcve for threading has been https://github.com/jpark7ca/face_recognition/blob/master/face_recognition_webcam_mt.py
 # next: make delanay into a thread and class, check the tutorial above for performance
+# pupil code bit https://stackoverflow.com/questions/67362053/is-there-a-way-to-select-a-specific-point-at-the-face-after-detecting-facial-lan
+
+
 
 import cv2
 from cv2 import FLOODFILL_FIXED_RANGE
@@ -60,7 +63,7 @@ def extract_index_nparray(nparray):
 def main():
 
     video_capture2 = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=1).start()
+    video_capture = VideoGet(src=2).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -303,9 +306,14 @@ def main():
 
         else:
             resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            if len(video_process.rightpupils) ==2:
+                cv2.circle(resultframe, video_process.rightpupils, 20, (0, 255, 0), -1)
+                cv2.circle(resultframe, video_process.leftpupils, 20, (0, 255, 0), -1)
             resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+            if len(video_process.rightpupils2) ==2:
+                cv2.circle(resultframe2, video_process.rightpupils2, 20, (0, 255, 0), -1)
+                cv2.circle(resultframe2, video_process.leftpupils2, 20, (0, 255, 0), -1)
 
- 
         outputs = np.concatenate((resultframe, resultframe2), axis=0) 
         cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
 
