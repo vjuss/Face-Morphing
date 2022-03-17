@@ -307,12 +307,12 @@ def main():
         else:
             resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
             if len(video_process.rightpupils) ==2:
-                cv2.circle(resultframe, video_process.rightpupils, 20, (0, 255, 0), -1)
-                cv2.circle(resultframe, video_process.leftpupils, 20, (0, 255, 0), -1)
+                cv2.circle(resultframe, video_process.rightpupils, 20, (255), -1)
+                cv2.circle(resultframe, video_process.leftpupils, 20, (255), -1)
             resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
             if len(video_process.rightpupils2) ==2:
-                cv2.circle(resultframe2, video_process.rightpupils2, 20, (0, 255, 0), -1)
-                cv2.circle(resultframe2, video_process.leftpupils2, 20, (0, 255, 0), -1)
+                cv2.circle(resultframe2, video_process.rightpupils2, 20, (255), -1)
+                cv2.circle(resultframe2, video_process.leftpupils2, 20, (255), -1)
 
         outputs = np.concatenate((resultframe, resultframe2), axis=0) 
         cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
