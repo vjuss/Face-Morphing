@@ -103,7 +103,6 @@ def main():
         # 
         #
         #  
-
         if matchresult == True: 
             print("faces match")
             matchtime = time.time() - start 
@@ -128,6 +127,9 @@ def main():
 
 
             if len(pastframes1) <= 30: #EFFECT 1. later: timer less than 20 s
+                #SOLVE NEXT: TWO DIFF OUTCOMES WITH THEIR OWN BACKGROUDS: NOW SAME FRAME IN BOTH RESULTS
+
+
                 print("effect 1")
 
                 gray = cv2.cvtColor(video_process.frame, cv2.COLOR_BGR2GRAY) 
@@ -287,12 +289,12 @@ def main():
 
                     # Reconstructing destination face vol2, new addition
 
-                    img1_new_face_rect_area = img1_new_face[y: y + h, x: x + w]  #y etc might need to come from rect1 
-                    img1_new_face_rect_area_gray = cv2.cvtColor(img1_new_face_rect_area, cv2.COLOR_BGR2GRAY)
-                    _, mask_triangles_designed2 = cv2.threshold(img1_new_face_rect_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
-                    warped_triangle_second = cv2.bitwise_and(warped_triangle_second, warped_triangle_second, mask=mask_triangles_designed2)
-                    img1_new_face_rect_area = cv2.add(img1_new_face_rect_area, warped_triangle_second)
-                    img1_new_face[y: y + h, x: x + w] = img1_new_face_rect_area  #y etc might need to come from rect1 
+                    # img1_new_face_rect_area = img1_new_face[y: yu + hu, x: xu + wu]  #y etc might need to come from rect1 
+                    # img1_new_face_rect_area_gray = cv2.cvtColor(img1_new_face_rect_area, cv2.COLOR_BGR2GRAY)
+                    # _, mask_triangles_designed2 = cv2.threshold(img1_new_face_rect_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
+                    # warped_triangle_second = cv2.bitwise_and(warped_triangle_second, warped_triangle_second, mask=mask_triangles_designed2)
+                    # img1_new_face_rect_area = cv2.add(img1_new_face_rect_area, warped_triangle_second)
+                    # img1_new_face[y: yu + hu, x: xu + wu] = img1_new_face_rect_area  #y etc might need to come from rect1 
 
 
 
@@ -366,6 +368,31 @@ def main():
                 print("effect 2")
                 resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                 resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+
+                #for both participants, delaunay becomes time travel between their own frames. Testing with one first
+
+                
+
+
+
+                
+
+
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
             #
             #
