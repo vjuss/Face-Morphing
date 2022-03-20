@@ -61,7 +61,6 @@ class CheckFaceLoc:
             for _face in _faces:
                 _landmarks = _predictor(_gray, _face)
                 self.landmarks = _landmarks
-                print(_landmarks)
                 _pupil_x = int((abs(_landmarks.part(39).x + _landmarks.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
                 _pupil_y = int((abs(_landmarks.part(39).y + _landmarks.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
                 _pupil_coordination = (_pupil_x, _pupil_y)

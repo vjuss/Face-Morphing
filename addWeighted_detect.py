@@ -63,7 +63,7 @@ def extract_index_nparray(nparray):
 def main():
 
     video_capture2 = VideoGet(src=0).start()  #0 and 1 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=2).start()
+    video_capture = VideoGet(src=1).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -307,13 +307,16 @@ def main():
 
         else:
             resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
-            if len(video_process.rightpupils) ==2:
-                cv2.circle(resultframe, video_process.rightpupils, 20, (255), -1)
-                cv2.circle(resultframe, video_process.leftpupils, 20, (255), -1)
             resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
-            if len(video_process.rightpupils2) ==2:
-                cv2.circle(resultframe2, video_process.rightpupils2, 20, (255), -1)
-                cv2.circle(resultframe2, video_process.leftpupils2, 20, (255), -1)
+
+            if len(video_process.rightpupils) ==2 and len(video_process.rightpupils2) ==2:
+                cv2.circle(resultframe2, video_process.rightpupils, 20, (0), -1) #drawing eyes to opponent's frame
+                cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
+                cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
+                cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
+
+            else:
+                print("not drawing eyes")
 
         outputs = np.concatenate((resultframe, resultframe2), axis=0) 
         cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
