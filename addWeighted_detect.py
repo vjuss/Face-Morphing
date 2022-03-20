@@ -99,7 +99,6 @@ def main():
             #idframe = video_capture.frame
             #vidframe2 = video_capture2.frame
             matchresult = False
-
         #
         # 
         #
@@ -208,6 +207,7 @@ def main():
 
                 # Creating empty mask
                 lines_space_mask = np.zeros_like(gray)
+                lines_space_mask2 = np.zeros_like(gray2)
                 #lines_space_new_face = np.zeros_like(video_process.frame2)
 
                 # Triangulation of both faces, NO NEED TO DO TWICE
@@ -221,7 +221,8 @@ def main():
 
                     rect1 = cv2.boundingRect(triangle1)
                     (x, y, w, h) = rect1
-                    cropped_triangle = video_process.frame[y: y + h, x: x + w]
+                    (xu, yu, wu, hu) = rect1
+                    cropped_triangle = video_process.frame[y: yu + hu, x: xu + wu]
                     cropped_tr1_mask = np.zeros((h, w), np.uint8)
 
 
@@ -245,8 +246,10 @@ def main():
 
                     rect2 = cv2.boundingRect(triangle2)
                     (x, y, w, h) = rect2
+                    (xn, yn, wn, hn) = rect2  # or rect1?
 
                     cropped_triangle2 = video_process.frame2[y: y + h, x: x + w]
+                    cropped_triangle2new = video_process.frame2[y: yn + hn, x: xn + wn]
 
                     cropped_tr2_mask = np.zeros((h, w), np.uint8)
 
@@ -256,16 +259,22 @@ def main():
 
                     cv2.fillConvexPoly(cropped_tr2_mask, points2, 255)
 
+                    # Lines space vol 2
+                    cv2.line(lines_space_mask2, tr2_pt1, tr2_pt2, 255)
+                    cv2.line(lines_space_mask2, tr2_pt2, tr2_pt3, 255)
+                    cv2.line(lines_space_mask2, tr2_pt1, tr2_pt3, 255)
+
+
                     # Warp triangles
                     points = np.float32(points)
                     points2 = np.float32(points2)
                     M = cv2.getAffineTransform(points, points2)
-                    M2 = cv2.getAffineTransform(points, points2)
+                    M2 = cv2.getAffineTransform(points2, points)
                     warped_triangle = cv2.warpAffine(cropped_triangle, M, (w, h))
                     warped_triangle = cv2.bitwise_and(warped_triangle, warped_triangle, mask=cropped_tr2_mask)
 
-                    warped_triangle_second = cv2.warpAffine(cropped_triangle2, M2, (w, h))
-                    warped_triangle_second = cv2.bitwise_and(warped_triangle_second, warped_triangle_second, mask=cropped_tr2_mask)#tr1 causes error
+                    warped_triangle_second = cv2.warpAffine(cropped_triangle2new, M2, (wn, hn))
+                    warped_triangle_second = cv2.bitwise_and(warped_triangle_second, warped_triangle_second, mask=cropped_tr2_mask)#tr1 causes error, likely to do with w and h rect1 rect2 thingy
 
                     # Reconstructing destination face
                     img2_new_face_rect_area = img2_new_face[y: y + h, x: x + w]
@@ -288,25 +297,39 @@ def main():
 
 
                 #Face swapped (putting 1st face into 2nd face)
+
+                opacity = len(pastframes1) * 8 #max value is 240
+
+
+
                 img2_face_mask = np.zeros_like(gray2)
-                img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, 100) #255 is full opacity
-                img2_head_mask2 = cv2.fillConvexPoly(img2_face_mask, convexhull2, 220) #255 is full opacity
+                #img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, 155) 
+                img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, opacity) 
+                #img2_head_mask2 = cv2.fillConvexPoly(img2_face_mask, convexhull2, 0) #255 is full face swap
                 img2_face_mask = cv2.bitwise_not(img2_head_mask)
-                img2_face_mask2 = cv2.bitwise_not(img2_head_mask2)
+                #img2_face_mask2 = cv2.bitwise_not(img2_head_mask2)
 
                 img2_head_noface = cv2.bitwise_and(video_process.frame2, video_process.frame2, mask=img2_face_mask)
-                img2_head_noface2 = cv2.bitwise_and(video_process.frame2, video_process.frame2, mask=img2_face_mask2)
+                img2_head_noface2 = cv2.bitwise_and(video_process.frame2, video_process.frame2, mask=img2_face_mask)
                 result = cv2.add(img2_head_noface, img2_new_face)
                 result2 = cv2.add(img2_head_noface2, img2_new_face) 
-
 
                 #Face swapped vol 2, new addition (putting 2st face into 1nd face)
 
                 img1_face_mask = np.zeros_like(gray)
-                img1_head_mask = cv2.fillConvexPoly(img1_face_mask, convexhull, 100) #255 is full opacity
+                img1_head_mask = cv2.fillConvexPoly(img1_face_mask, convexhull2, 100) #255 is full opacity
                 img1_face_mask = cv2.bitwise_not(img1_head_mask)
                 img1_head_noface = cv2.bitwise_and(video_process.frame, video_process.frame, mask=img1_face_mask)
-                result3 = cv2.add(img1_head_noface, img1_new_face)
+                #result2 = cv2.add(img1_head_noface, img1_new_face)
+
+
+                #Face swapped vol 3, new addition (putting 2st face into 1nd face)
+
+                # img1_face_mask = np.zeros_like(gray)
+                # img1_head_mask = cv2.fillConvexPoly(img1_face_mask, convexhull, 100) #255 is full opacity
+                # img1_face_mask = cv2.bitwise_not(img1_head_mask)
+                # img1_head_noface = cv2.bitwise_and(video_process.frame, video_process.frame, mask=img1_face_mask)
+                # result3 = cv2.add(img1_head_noface, img1_new_face)
 
 
 
@@ -316,7 +339,7 @@ def main():
                 seamlessclone = cv2.seamlessClone(result, video_process.frame2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
                 seamlessclone = cv2.cvtColor(seamlessclone, cv2.COLOR_BGR2GRAY)
 
-                seamlessclone2 = cv2.seamlessClone(result2, video_process.frame2, img2_head_mask2, center_face2, cv2.NORMAL_CLONE)
+                seamlessclone2 = cv2.seamlessClone(result2, video_process.frame2, img2_head_mask, center_face2, cv2.NORMAL_CLONE)
                 seamlessclone2 = cv2.cvtColor(seamlessclone2, cv2.COLOR_BGR2GRAY)
                 #cv2.imshow("result", seamlessclone) #
 
@@ -327,9 +350,10 @@ def main():
 
                 (x2, y2, w2, h2) = cv2.boundingRect(convexhull)
                 center_face = (int((x2 + x2 + w2) / 2), int((y2 + y2+ h2) / 2))
-                seamlessclone3 = cv2.seamlessClone(result3, video_process.frame, img1_head_mask, center_face, cv2.NORMAL_CLONE)
-                seamlessclone3 = cv2.cvtColor(seamlessclone3, cv2.COLOR_BGR2GRAY)
-                resultframe3 = seamlessclone3
+                 #seamlessclone3 = cv2.seamlessClone(result3, video_process.frame, img1_head_mask, center_face, cv2.NORMAL_CLONE)
+                 #seamlessclone3 = cv2.cvtColor(seamlessclone3, cv2.COLOR_BGR2GRAY)
+                #resultframe3 = seamlessclone3
+                #resultframe3 = seamlessclone3
             #
             #
             #
@@ -379,19 +403,19 @@ def main():
 
         else: # if match result not true, just draw eyes
             resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
-            resultframe3 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+            resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
             if len(video_process.rightpupils) ==2 and len(video_process.rightpupils2) ==2:
-                cv2.circle(resultframe3, video_process.rightpupils, 20, (0), -1) #drawing eyes to opponent's frame
-                cv2.circle(resultframe3, video_process.leftpupils, 20, (0), -1)
+                cv2.circle(resultframe2, video_process.rightpupils, 20, (0), -1) #drawing eyes to opponent's frame
+                cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
                 cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
                 cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
 
             else:
                 print("not drawing eyes")
 
-        outputs = np.concatenate((resultframe, resultframe3), axis=0) 
-        cv2.imshow("Result", outputs) #CURRENT ERROR COMES FROM HERE: error: (-215:Assertion failed) size.width>0 && size.height>0 in function 'imshow'
+        outputs = np.concatenate((resultframe, resultframe2), axis=0) 
+        cv2.imshow("Result", outputs) 
 
         key = cv2.waitKey(1)
         if key == 27: #esc
