@@ -29,6 +29,7 @@
 
 
 
+from cgitb import handler
 import cv2
 from cv2 import FLOODFILL_FIXED_RANGE
 import numpy as np
@@ -137,13 +138,13 @@ def main():
 
                 sourcemask = np.zeros_like(sourcegray)
                 height, width, channels = destinationframe.shape #was vidframe2
+                height2, width2, channels2 = sourceframe.shape
                 destination_new_face = np.zeros((height, width, channels), np.uint8)
+                source_new_face = np.zeros((height2, width2, channels2), np.uint8)
                 indexes_triangles = []
 
                 destinationmask = np.zeros_like(destinationgray)
                 height2, width2, channels2 = sourceframe.shape 
-                img1_new_face = np.zeros((height2, width2, channels2), np.uint8) #SECOND MASK
-                indexes_triangles2 = [] #SECOND MASK
 
                 #landmarks of first face
 
@@ -210,7 +211,7 @@ def main():
                 # Creating empty mask
                 source_lines_space_mask = np.zeros_like(sourcegray)
                 destination_lines_space_mask = np.zeros_like(destinationgray)
-                #lines_space_new_face = np.zeros_like(video_process.frame2)
+
 
                 # Triangulation of both faces, NO NEED TO DO TWICE
                 for triangle_index in indexes_triangles:
@@ -248,12 +249,16 @@ def main():
 
                     rect2 = cv2.boundingRect(destinationtriangle)
                     (x, y, w, h) = rect2
-                    (xn, yn, wn, hn) = rect2  # or rect1?
 
-                    cropped_triangle2 = destinationframe[y: y + h, x: x + w]
-                    cropped_triangle2new = destinationframe[y: yn + hn, x: xn + wn]
 
                     cropped_tr2_mask = np.zeros((h, w), np.uint8)
+
+        
+                    cropped_triangle_source = sourceframe[y: y + h, x: x + w] #OR dest frame?
+                    cropped_tr_mask_source = np.zeros((h, w), np.uint8)  #MASK NOT CORRECT YET
+    
+
+                    
 
                     destinationpoints = np.array([[tr2_pt1[0] - x, tr2_pt1[1] - y],
                                         [tr2_pt2[0] - x, tr2_pt2[1] - y],
@@ -275,9 +280,10 @@ def main():
                     warped_triangle = cv2.warpAffine(cropped_triangle, M, (w, h))
                     warped_triangle = cv2.bitwise_and(warped_triangle, warped_triangle, mask=cropped_tr2_mask)
 
-                    warped_triangle_second = cv2.warpAffine(cropped_triangle2new, M2, (wn, hn))
-                    warped_triangle_second = cv2.bitwise_and(warped_triangle_second, warped_triangle_second, mask=cropped_tr2_mask)#tr1 causes error, likely to do with w and h rect1 rect2 thingy
+                    warped_triangle_source = cv2.warpAffine(cropped_triangle_source, M, (w, h)) #THESE NOT CORRECT YET: CROPPED, M, w, h
+                    warped_triangle_source = cv2.bitwise_and(warped_triangle_source, warped_triangle_source, mask=cropped_tr_mask_source)
 
+                
                     # Reconstructing destination face
                     destination_new_face_rect_area = destination_new_face[y: y + h, x: x + w]
                     destination_new_face_rect_area_gray = cv2.cvtColor(destination_new_face_rect_area, cv2.COLOR_BGR2GRAY)
@@ -287,15 +293,15 @@ def main():
                     destination_new_face_rect_area = cv2.add(destination_new_face_rect_area, warped_triangle)
                     destination_new_face[y: y + h, x: x + w] = destination_new_face_rect_area
 
-                    # Reconstructing destination face vol2, new addition
+                    # Reconstructing source face
 
-                    # img1_new_face_rect_area = img1_new_face[y: yu + hu, x: xu + wu]  #y etc might need to come from rect1 
-                    # img1_new_face_rect_area_gray = cv2.cvtColor(img1_new_face_rect_area, cv2.COLOR_BGR2GRAY)
-                    # _, mask_triangles_designed2 = cv2.threshold(img1_new_face_rect_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
-                    # warped_triangle_second = cv2.bitwise_and(warped_triangle_second, warped_triangle_second, mask=mask_triangles_designed2)
-                    # img1_new_face_rect_area = cv2.add(img1_new_face_rect_area, warped_triangle_second)
-                    # img1_new_face[y: yu + hu, x: xu + wu] = img1_new_face_rect_area  #y etc might need to come from rect1 
+                    source_new_face_rect_area = source_new_face[y: y + h, x: x + w]    #H, W ETC need editing. #THESE NOT CORRECT YET
+                    source_new_face_rect_area_gray = cv2.cvtColor(source_new_face_rect_area, cv2.COLOR_BGR2GRAY)
+                    _, mask_triangles_designed_source = cv2.threshold(source_new_face_rect_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
+                    warped_triangle_source = cv2.bitwise_and(warped_triangle_source, warped_triangle_source, mask=mask_triangles_designed_source)
 
+                    source_new_face_rect_area = cv2.add(source_new_face_rect_area, warped_triangle_source)
+                    source_new_face[y: y + h, x: x + w] = source_new_face_rect_area
 
 
                 #Face swapped (putting 1st face into 2nd face)
@@ -303,57 +309,33 @@ def main():
                 opacity = len(pastframes1) * 8 #max value is 24
 
                 destination_swapped_face_mask = np.zeros_like(destinationgray)
+                source_swapped_face_mask = np.zeros_like(sourcegray)
                 #img2_head_mask = cv2.fillConvexPoly(img2_face_mask, convexhull2, 155) 
                 destination_head_mask = cv2.fillConvexPoly(destination_swapped_face_mask, destinationconvexhull, opacity) 
-                #img2_head_mask2 = cv2.fillConvexPoly(img2_face_mask, convexhull2, 0) #255 is full face swap
+                source_head_mask_new = cv2.fillConvexPoly(source_swapped_face_mask, sourceconvexhull, opacity) #EDITED
                 destination_swapped_face_mask = cv2.bitwise_not(destination_head_mask)
-                #img2_face_mask2 = cv2.bitwise_not(img2_head_mask2)
+                source_swapped_face_mask = cv2.bitwise_not(source_head_mask_new)
 
                 destination_head_noface = cv2.bitwise_and(destinationframe, destinationframe, mask=destination_swapped_face_mask)
-                destination_head_noface_copy = cv2.bitwise_and(destinationframe, destinationframe, mask=destination_swapped_face_mask)
+                source_head_noface_new = cv2.bitwise_and(sourceframe, sourceframe, mask=source_swapped_face_mask)
                 result = cv2.add(destination_head_noface, destination_new_face)
-                result2 = cv2.add(destination_head_noface_copy, destination_new_face) 
-
-                #Face swapped vol 2, new addition (putting 2st face into 1nd face)
-
-                img1_face_mask = np.zeros_like(sourcegray)
-                img1_head_mask = cv2.fillConvexPoly(img1_face_mask, destinationconvexhull, 100) #255 is full opacity
-                img1_face_mask = cv2.bitwise_not(img1_head_mask)
-                img1_head_noface = cv2.bitwise_and(sourceframe, sourceframe, mask=img1_face_mask)
-                #result2 = cv2.add(img1_head_noface, img1_new_face)
-
-
-                #Face swapped vol 3, new addition (putting 2st face into 1nd face)
-
-                # img1_face_mask = np.zeros_like(gray)
-                # img1_head_mask = cv2.fillConvexPoly(img1_face_mask, convexhull, 100) #255 is full opacity
-                # img1_face_mask = cv2.bitwise_not(img1_head_mask)
-                # img1_head_noface = cv2.bitwise_and(video_process.frame, video_process.frame, mask=img1_face_mask)
-                # result3 = cv2.add(img1_head_noface, img1_new_face)
-
-
+                result2 = cv2.add(source_head_noface_new , source_new_face) 
+    
 
                 # Creating seamless clone of two faces
                 (x, y, w, h) = cv2.boundingRect(destinationconvexhull)
                 center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
+                (x2, y2, w2, h2) = cv2.boundingRect(sourceconvexhull)
+                center_face_source = (int((x2 + x2 + w2) / 2), int((y2 + y2 + h2) / 2))
                 seamlessclone = cv2.seamlessClone(result, destinationframe, destination_head_mask, center_face2, cv2.NORMAL_CLONE)
                 seamlessclone = cv2.cvtColor(seamlessclone, cv2.COLOR_BGR2GRAY)
 
-                seamlessclone2 = cv2.seamlessClone(result2, destinationframe, destination_head_mask, center_face2, cv2.NORMAL_CLONE)
+                seamlessclone2 = cv2.seamlessClone(result2, sourceframe, source_head_mask_new, center_face_source, cv2.NORMAL_CLONE)  #EDITED
                 seamlessclone2 = cv2.cvtColor(seamlessclone2, cv2.COLOR_BGR2GRAY)
-                #cv2.imshow("result", seamlessclone) #
 
                 resultframe = seamlessclone
                 resultframe2 = seamlessclone2
 
-                # NEW ADDITION FOR OPPOSITE SWITCH
-
-                (x2, y2, w2, h2) = cv2.boundingRect(sourceconvexhull)
-                center_face = (int((x2 + x2 + w2) / 2), int((y2 + y2+ h2) / 2))
-                 #seamlessclone3 = cv2.seamlessClone(result3, video_process.frame, img1_head_mask, center_face, cv2.NORMAL_CLONE)
-                 #seamlessclone3 = cv2.cvtColor(seamlessclone3, cv2.COLOR_BGR2GRAY)
-                #resultframe3 = seamlessclone3
-                #resultframe3 = seamlessclone3
             #
             #
             #
