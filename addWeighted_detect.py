@@ -264,10 +264,12 @@ def main():
 
                     destination_rectangle = cv2.boundingRect(destination_triangle)
                     (x, y, w, h) = destination_rectangle
+                    cropped_destination_rectangle = sourceframe[y: y + h, x: x + w] #OR dest frame?
+
                     cropped_destination_rectangle_mask = np.zeros((h, w), np.uint8)
 
         
-                    cropped_triangle_source = sourceframe[y: y + h, x: x + w] #OR dest frame?
+                    
                     cropped_tr_mask_source = np.zeros((h, w), np.uint8)  #MASK NOT CORRECT YET
     
 
@@ -295,7 +297,7 @@ def main():
                     warped_triangle = cv2.bitwise_and(warped_rectangle, warped_rectangle, mask=cropped_destination_rectangle_mask)
 
 
-                    warped_triangle_2 = cv2.warpAffine(cropped_triangle_source, matrix, (w, h)) #THESE NOT CORRECT YET: CROPPED, M, w, h
+                    warped_triangle_2 = cv2.warpAffine(cropped_destination_rectangle, matrix, (w, h)) #THESE NOT CORRECT YET: CROPPED, M, w, h
                     warped_triangle_2 = cv2.bitwise_and(warped_triangle_2, warped_triangle_2, mask=cropped_tr_mask_source)
 
                 
