@@ -213,7 +213,6 @@ def main():
                         y = destinationlandmarks.part(n).y
                         destinationlandmarks_points.append((x, y))
 
-
                     destination_triangle_points = np.array(destinationlandmarks_points, np.int32)
                     destinationconvexhull = cv2.convexHull(destination_triangle_points)
                     cv2.fillConvexPoly(destinationmask, destinationconvexhull, 255)  
@@ -221,6 +220,7 @@ def main():
 
                 # Iterating through all source delaunay triangle and superimposing source triangles in empty destination canvas after warping to same size as destination triangles' shape
                 for triangle_index in indexes_triangles:
+
                     # Triangulation of the first face
                     tr1_pt1 = sourcelandmarks_points[triangle_index[0]]
                     tr1_pt2 = sourcelandmarks_points[triangle_index[1]]
@@ -231,7 +231,7 @@ def main():
                     source_rectangle = cv2.boundingRect(source_triangle)
                     (x, y, w, h) = source_rectangle
                     (xu, yu, wu, hu) = source_rectangle
-                    cropped_source_rectangle = destinationframe[y: yu + hu, x: xu + wu]
+                    cropped_source_rectangle = sourceframe[y: yu + hu, x: xu + wu]
                     cropped_source_rectangle_mask = np.zeros((hu, wu), np.uint8)
 
                     source_triangle_points = np.array([[tr1_pt1[0] - x, tr1_pt1[1] - y],
@@ -253,7 +253,7 @@ def main():
                     destination_rectangle = cv2.boundingRect(destination_triangle)
                     (x, y, w, h) = destination_rectangle
 
-                    cropped_destination_rectangle = sourceframe[y: y + h, x: x + w]
+                    cropped_destination_rectangle = sourceframe[y: y + h, x: x + w]  #was sourceframe and worked
                     cropped_destination_rectangle_mask = np.zeros((h, w), np.uint8)
 
                     destination_triangle_points = np.array([[tr2_pt1[0] - x, tr2_pt1[1] - y],
@@ -273,12 +273,12 @@ def main():
                     warped_rectangle = cv2.warpAffine(cropped_source_rectangle, matrix, (w, h))
                     warped_triangle = cv2.bitwise_and(warped_rectangle, warped_rectangle, mask=cropped_destination_rectangle_mask)
 
-                    warped_rectangle_2 = cv2.warpAffine(cropped_destination_rectangle, matrix2, (wu, hu)) #THESE NOT CORRECT YET: CROPPED, M, w, h
+                    warped_rectangle_2 = cv2.warpAffine(cropped_destination_rectangle, matrix2, (wu, hu)) 
                     warped_triangle_2 = cv2.bitwise_and(warped_rectangle_2, warped_rectangle_2, mask=cropped_source_rectangle_mask)
 
                 
                     #  Reconstructing destination face in empty canvas of destination image
-                    new_dest_face_canvas_area = destination_image_canvas[y: y + h, x: x + w] # h y etc. are from dest rect adn it works
+                    new_dest_face_canvas_area = destination_image_canvas[y: y + h, x: x + w] # h y etc. are from dest rect and it works
                     new_dest_face_canvas_area_gray = cv2.cvtColor(new_dest_face_canvas_area, cv2.COLOR_BGR2GRAY)
 
                     _, mask_created_triangle = cv2.threshold(new_dest_face_canvas_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
@@ -316,6 +316,7 @@ def main():
                 final_source_canvas = cv2.bitwise_not(final_source_face_mask)
                 source_face_masked = cv2.bitwise_and(sourceframe, sourceframe, mask=final_source_canvas)
                 result2 = cv2.add(source_face_masked , source_image_canvas) 
+         
     
 
                 # Creating seamless clone of two faces
