@@ -114,13 +114,7 @@ def main():
            
             pastframes1.append(vidframe) # storing ghost images to be used later
             pastframes2.append(vidframe2) #
-        
-            #WE WANT TO TRIGGER TIMER 
-            #IF TIMER LESS THEN 20S, USE DELAUNAY EFFECT 1
-            #IF TIMER BETWEEN 20S AND 40S, USE DELAUNAY EFFECT 2
-            #IF TIMER BETWEEN 40-60S, USE DELAUNAY EFFECT 3 
-
-
+    
             if len(pastframes1) <= 30: #EFFECT 1. later: timer less than 20 s
 
                 print("faces match")
@@ -131,11 +125,6 @@ def main():
            
             pastframes1.append(vidframe) # storing ghost images to be used later
             pastframes2.append(vidframe2) #
-        
-            #WE WANT TO TRIGGER TIMER 
-            #IF TIMER LESS THEN 20S, USE DELAUNAY EFFECT 1
-            #IF TIMER BETWEEN 20S AND 40S, USE DELAUNAY EFFECT 2
-            #IF TIMER BETWEEN 40-60S, USE DELAUNAY EFFECT 3 
 
 
             if len(pastframes1) <= 30: #EFFECT 1. later: timer less than 20 s
@@ -143,10 +132,13 @@ def main():
                 print("effect 1")
 
                 sourceframe = video_process.frame
+                print("sourceframe",sourceframe  )
                 destinationframe = video_process.frame2
+                print("destframe",destinationframe  )
 
-                height, width, channels = destinationframe.shape #was vidframe2
                 height2, width2, channels2 = sourceframe.shape
+                height, width, channels = destinationframe.shape #was vidframe2
+                
 
                 sourcegray = cv2.cvtColor(sourceframe, cv2.COLOR_BGR2GRAY) 
                 destinationgray = cv2.cvtColor(destinationframe, cv2.COLOR_BGR2GRAY) 
@@ -229,14 +221,18 @@ def main():
 
                     # Source rectangle
                     source_rectangle = cv2.boundingRect(source_triangle)
-                    (x, y, w, h) = source_rectangle
+                    print("source rectangle", source_rectangle) #819, 468, 43, 62
                     (xu, yu, wu, hu) = source_rectangle
-                    cropped_source_rectangle = sourceframe[y: yu + hu, x: xu + wu]
+                    print("sorce rect bounds xu etc ", xu, yu, wu, hu) #819, 468, 43, 62
+                    print("src frame again", sourceframe)
+
+                    cropped_source_rectangle = sourceframe[yu: yu + hu, xu: xu + wu] #even destinationframe here returns empty. tested yu and xu
+                    print("first cropped soruce rectangle", cropped_source_rectangle )# IS EMPTY
                     cropped_source_rectangle_mask = np.zeros((hu, wu), np.uint8)
 
-                    source_triangle_points = np.array([[tr1_pt1[0] - x, tr1_pt1[1] - y],
-                                    [tr1_pt2[0] - x, tr1_pt2[1] - y],
-                                    [tr1_pt3[0] - x, tr1_pt3[1] - y]], np.int32)
+                    source_triangle_points = np.array([[tr1_pt1[0] - xu, tr1_pt1[1] - yu],
+                                    [tr1_pt2[0] - xu, tr1_pt2[1] - yu],
+                                    [tr1_pt3[0] - xu, tr1_pt3[1] - yu]], np.int32) # should be xu, was x y etc beofre
 
                     cv2.fillConvexPoly(cropped_source_rectangle_mask, source_triangle_points, 255)
 
@@ -248,12 +244,14 @@ def main():
                     tr2_pt3 = destinationlandmarks_points[triangle_index[2]]
                     destination_triangle = np.array([tr2_pt1, tr2_pt2, tr2_pt3], np.int32)
 
-
                     # Dest rectangle, WORKS
                     destination_rectangle = cv2.boundingRect(destination_triangle)
+                    print("destination rectangle", destination_rectangle) #819, 468, 43, 62
                     (x, y, w, h) = destination_rectangle
+                    print("det rect bounds x y etc ", x, y, w, h)
 
-                    cropped_destination_rectangle = sourceframe[y: y + h, x: x + w]  #was sourceframe and worked
+                    cropped_destination_rectangle = destinationframe[y: y + h, x: x + w]  #was sourceframe and worked
+                    print("first cropped dest rectangle", cropped_destination_rectangle ) #returns walues
                     cropped_destination_rectangle_mask = np.zeros((h, w), np.uint8)
 
                     destination_triangle_points = np.array([[tr2_pt1[0] - x, tr2_pt1[1] - y],
@@ -266,6 +264,8 @@ def main():
                     # Warp source triangle to match shape of destination triangle and put it over destination triangle mask
                     source_triangle_points = np.float32(source_triangle_points)
                     destination_triangle_points = np.float32(destination_triangle_points)
+                    print("dest triangle points", destination_triangle_points)
+                    print("src triangle points", source_triangle_points)
 
                     matrix = cv2.getAffineTransform(source_triangle_points, destination_triangle_points)
                     matrix2 = cv2.getAffineTransform(destination_triangle_points, source_triangle_points)
@@ -278,7 +278,9 @@ def main():
 
                 
                     #  Reconstructing destination face in empty canvas of destination image
+                    print(y, h, x, w) # 433 19 1011 24
                     new_dest_face_canvas_area = destination_image_canvas[y: y + h, x: x + w] # h y etc. are from dest rect and it works
+                    #print(new_dest_face_canvas_area) #pritns an array of zeors
                     new_dest_face_canvas_area_gray = cv2.cvtColor(new_dest_face_canvas_area, cv2.COLOR_BGR2GRAY)
 
                     _, mask_created_triangle = cv2.threshold(new_dest_face_canvas_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
@@ -288,14 +290,15 @@ def main():
                     destination_image_canvas[y: y + h, x: x + w] = new_dest_face_canvas_area
 
                     # Reconstructing source face in empty canvas of source image
-
-                    new_source_face_canvas_area = source_image_canvas[y: yu + hu, x: xu + wu]    # hu et are from source rect now
+                    print(yu, hu, xu, wu) # 503 13 922 30
+                    new_source_face_canvas_area = source_image_canvas[yu: yu + hu, xu: xu + wu]    # THIS WAS EMPTY when y: yu = hu
+                    #print(new_source_face_canvas_area)#pritns an EMPTY ARRAY
                     new_source_face_canvas_area_gray = cv2.cvtColor(new_source_face_canvas_area, cv2.COLOR_BGR2GRAY)
                     _, mask_created_triangle_2 = cv2.threshold(new_source_face_canvas_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
                     warped_triangle_2 = cv2.bitwise_and(warped_triangle_2, warped_triangle_2, mask=mask_created_triangle_2)
 
                     new_source_face_canvas_area = cv2.add(new_source_face_canvas_area, warped_triangle_2)
-                    source_image_canvas[y: yu + hu, x: xu + wu] = new_source_face_canvas_area
+                    source_image_canvas[yu: yu + hu, xu: xu + wu] = new_source_face_canvas_area
 
 
                 ## Put reconstructed face on the destination image
@@ -348,29 +351,7 @@ def main():
 
                 #for both participants, delaunay becomes time travel between their own frames. Testing with one first
 
-                
 
-
-
-                
-
-
-                
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
             #
             #
             #
