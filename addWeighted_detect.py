@@ -159,7 +159,6 @@ def main():
 
                 indexes_triangles = []
 
-    
                 #landmarks of first face
 
                 sourcefaces = video_process.faces 
@@ -174,7 +173,6 @@ def main():
                         sourcelandmarks_points.append((x, y))
 
                     source_triangle_points = np.array(sourcelandmarks_points, np.int32)
-
                     sourceconvexhull = cv2.convexHull(source_triangle_points)
                     cv2.fillConvexPoly(sourcemask, sourceconvexhull, 255)    
                     
@@ -187,7 +185,6 @@ def main():
                     sourcetriangles = sourcesubdiv.getTriangleList()
                     sourcetriangles = np.array(sourcetriangles, dtype=np.int32)
                     
-                    #indexes_triangles = []
 
                     for t in sourcetriangles:
                         pt1 = (t[0], t[1])
@@ -222,12 +219,6 @@ def main():
                     cv2.fillConvexPoly(destinationmask, destinationconvexhull, 255)  
 
 
-                # Creating empty mask
-                source_lines_space_mask = np.zeros_like(sourcegray)
-                destination_lines_space_mask = np.zeros_like(destinationgray)
-
-
-
                 # Iterating through all source delaunay triangle and superimposing source triangles in empty destination canvas after warping to same size as destination triangles' shape
                 for triangle_index in indexes_triangles:
                     # Triangulation of the first face
@@ -236,13 +227,12 @@ def main():
                     tr1_pt3 = sourcelandmarks_points[triangle_index[2]]
                     source_triangle = np.array([tr1_pt1, tr1_pt2, tr1_pt3], np.int32)
 
-
+                    # Source rectangle
                     source_rectangle = cv2.boundingRect(source_triangle)
                     (x, y, w, h) = source_rectangle
                     (xu, yu, wu, hu) = source_rectangle
-                    cropped_source_rectangle = sourceframe[y: yu + hu, x: xu + wu]
-                    cropped_source_rectangle_mask = np.zeros((h, w), np.uint8)
-
+                    cropped_source_rectangle = destinationframe[y: yu + hu, x: xu + wu]
+                    cropped_source_rectangle_mask = np.zeros((hu, wu), np.uint8)
 
                     source_triangle_points = np.array([[tr1_pt1[0] - x, tr1_pt1[1] - y],
                                     [tr1_pt2[0] - x, tr1_pt2[1] - y],
@@ -250,10 +240,7 @@ def main():
 
                     cv2.fillConvexPoly(cropped_source_rectangle_mask, source_triangle_points, 255)
 
-                    # Lines space
-                    cv2.line(source_lines_space_mask, tr1_pt1, tr1_pt2, 255)
-                    cv2.line(source_lines_space_mask, tr1_pt2, tr1_pt3, 255)
-                    cv2.line(source_lines_space_mask, tr1_pt1, tr1_pt3, 255)
+
 
                     # Triangulation of second face
                     tr2_pt1 = destinationlandmarks_points[triangle_index[0]]
@@ -262,17 +249,12 @@ def main():
                     destination_triangle = np.array([tr2_pt1, tr2_pt2, tr2_pt3], np.int32)
 
 
+                    # Dest rectangle, WORKS
                     destination_rectangle = cv2.boundingRect(destination_triangle)
                     (x, y, w, h) = destination_rectangle
-                    cropped_destination_rectangle = sourceframe[y: y + h, x: x + w] #OR dest frame?
 
+                    cropped_destination_rectangle = sourceframe[y: y + h, x: x + w]
                     cropped_destination_rectangle_mask = np.zeros((h, w), np.uint8)
-
-        
-                    
-                    cropped_tr_mask_source = np.zeros((h, w), np.uint8)  #MASK NOT CORRECT YET
-    
-
 
                     destination_triangle_points = np.array([[tr2_pt1[0] - x, tr2_pt1[1] - y],
                                         [tr2_pt2[0] - x, tr2_pt2[1] - y],
@@ -281,28 +263,22 @@ def main():
                     cv2.fillConvexPoly(cropped_destination_rectangle_mask, destination_triangle_points, 255)
 
 
-                    # Lines space vol 2
-                    cv2.line(destination_lines_space_mask, tr2_pt1, tr2_pt2, 255)
-                    cv2.line(destination_lines_space_mask, tr2_pt2, tr2_pt3, 255)
-                    cv2.line(destination_lines_space_mask, tr2_pt1, tr2_pt3, 255)
-
-
                     # Warp source triangle to match shape of destination triangle and put it over destination triangle mask
                     source_triangle_points = np.float32(source_triangle_points)
                     destination_triangle_points = np.float32(destination_triangle_points)
+
                     matrix = cv2.getAffineTransform(source_triangle_points, destination_triangle_points)
-                    # M2 = cv2.getAffineTransform(destination_triangle_points, source_triangle_points)
+                    matrix2 = cv2.getAffineTransform(destination_triangle_points, source_triangle_points)
 
                     warped_rectangle = cv2.warpAffine(cropped_source_rectangle, matrix, (w, h))
                     warped_triangle = cv2.bitwise_and(warped_rectangle, warped_rectangle, mask=cropped_destination_rectangle_mask)
 
-
-                    warped_triangle_2 = cv2.warpAffine(cropped_destination_rectangle, matrix, (w, h)) #THESE NOT CORRECT YET: CROPPED, M, w, h
-                    warped_triangle_2 = cv2.bitwise_and(warped_triangle_2, warped_triangle_2, mask=cropped_tr_mask_source)
+                    warped_rectangle_2 = cv2.warpAffine(cropped_destination_rectangle, matrix2, (wu, hu)) #THESE NOT CORRECT YET: CROPPED, M, w, h
+                    warped_triangle_2 = cv2.bitwise_and(warped_rectangle_2, warped_rectangle_2, mask=cropped_source_rectangle_mask)
 
                 
                     #  Reconstructing destination face in empty canvas of destination image
-                    new_dest_face_canvas_area = destination_image_canvas[y: y + h, x: x + w]
+                    new_dest_face_canvas_area = destination_image_canvas[y: y + h, x: x + w] # h y etc. are from dest rect adn it works
                     new_dest_face_canvas_area_gray = cv2.cvtColor(new_dest_face_canvas_area, cv2.COLOR_BGR2GRAY)
 
                     _, mask_created_triangle = cv2.threshold(new_dest_face_canvas_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
@@ -313,13 +289,13 @@ def main():
 
                     # Reconstructing source face in empty canvas of source image
 
-                    new_source_face_canvas_area = source_image_canvas[y: y + h, x: x + w]    #H, W ETC need editing. #THESE NOT CORRECT YET
+                    new_source_face_canvas_area = source_image_canvas[y: yu + hu, x: xu + wu]    # hu et are from source rect now
                     new_source_face_canvas_area_gray = cv2.cvtColor(new_source_face_canvas_area, cv2.COLOR_BGR2GRAY)
                     _, mask_created_triangle_2 = cv2.threshold(new_source_face_canvas_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
                     warped_triangle_2 = cv2.bitwise_and(warped_triangle_2, warped_triangle_2, mask=mask_created_triangle_2)
 
                     new_source_face_canvas_area = cv2.add(new_source_face_canvas_area, warped_triangle_2)
-                    source_image_canvas[y: y + h, x: x + w] = new_source_face_canvas_area
+                    source_image_canvas[y: yu + hu, x: xu + wu] = new_source_face_canvas_area
 
 
                 ## Put reconstructed face on the destination image
