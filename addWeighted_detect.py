@@ -1,31 +1,9 @@
-#steps for first MVP
-#1)alert when faces match (rect fine first) DONE
-#2)add two output feeds DONE
-#3)test effetc: make addweighted a variable that changes on outputs when faces match in the og DONE
-#4)introduce old frame sequences to outputs when faces match: 
-# what we see is no longer real time for a while and that has effect on detetcyopn
-#5)add timing to the effect if needed: will it continue until faces matc gain / 10 secs etv
-#6)delanay etc blurring can make it difficult to detect whose face it is and thus match. it can gap two people or one person in diff times
-#7)improve performance: try threads and maybe switch from python to openframeworks or use lighter face detection model
-
-#IDEAS
-#maybe face analysis is being done on outputs at some point instead
-#play with addweighted value(s;ider): this can make your own face disappear and the other appear, this affewcst results, there could be two output results with different added weights and different detections 
-#think about the effects: will the image be blurred, delanay, filter etc when match and what happens when that connection breaks? 
-# potentially touch the raw feed as well: will the resulting effect break the connection by blurring etc. making face not visibles
-# in output feeds, delanay can make it difficult to detect whose face it is and thus match
-#study this for effects https://docs.opencv.org/4.x/d2/d96/tutorial_py_table_of_contents_imgproc.html
-#will the effect bridge time gaps instead of two people? or both
-#add a model that recognises when face is diff from other face and explore when it only sees one face!!
-#replace eyes with other persons eyes: try spliot scanning
-#add glitches from third webcam (observer of both peple, space) to the mix
-#blurrinf etc transition effects
-# goal is to make eyes align
-#sound
-# potentially add GAN to generate nww faces. CAN ALSO REPLACE DELANAY OIN THIS CODE
-# one helpful sourcve for threading has been https://github.com/jpark7ca/face_recognition/blob/master/face_recognition_webcam_mt.py
-# next: make delanay into a thread and class, check the tutorial above for performance
-# pupil code bit https://stackoverflow.com/questions/67362053/is-there-a-way-to-select-a-specific-point-at-the-face-after-detecting-facial-lan
+#steps: 
+#1)when less than two faces spotted, show participants own face and don't calculate faces
+#2)when two faces, show opponents face and only then find landmarks adn draw your own pupils
+#3)when eyes mach, keep the frames like they are (you see opponent) and start to apply delaunay until 255
+#4) effet 2
+#5) effetc 3(back to opponent)
 
 
 
@@ -119,20 +97,8 @@ def main():
             #
             #
             #
-    
-            if len(pastframes1) <= 30: #EFFECT 1. later: timer less than 20 s
 
-                print("faces match")
-            matchtime = time.time() - start 
-            print(matchtime)  #this number grows every time loop is run
-            currenttime = time.time() -matchtime - start
-            print(currenttime)
-           
-            pastframes1.append(vidframe) # storing ghost images to be used later
-            pastframes2.append(vidframe2) #
-
-
-            if len(pastframes1) <= 30: #EFFECT 1. later: timer less than 20 s
+            if len(pastframes1) <= 300: #EFFECT 1. later: timer less than 20 s
                 print("effect 1")
                 sourceframe = video_process.frame
                 destinationframe = video_process.frame2
@@ -293,7 +259,7 @@ def main():
                 opacity = len(pastframes1) * 8 #max value is 24
 
                 final_destination_canvas = np.zeros_like(destinationgray)
-                final_destination_face_mask = cv2.fillConvexPoly(final_destination_canvas, destinationconvexhull, 255) 
+                final_destination_face_mask = cv2.fillConvexPoly(final_destination_canvas, destinationconvexhull, 155) 
                 final_destination_canvas = cv2.bitwise_not(final_destination_face_mask)
                 destination_face_masked = cv2.bitwise_and(destinationframe, destinationframe, mask=final_destination_canvas)
                 result = cv2.add(destination_face_masked, destination_image_canvas)
@@ -302,7 +268,7 @@ def main():
                 # Put reconstructed face on the source image
 
                 final_source_canvas = np.zeros_like(sourcegray)
-                final_source_face_mask = cv2.fillConvexPoly(final_source_canvas, sourceconvexhull, 255) #EDITED
+                final_source_face_mask = cv2.fillConvexPoly(final_source_canvas, sourceconvexhull, 155) #EDITED
                 final_source_canvas = cv2.bitwise_not(final_source_face_mask)
                 source_face_masked = cv2.bitwise_and(sourceframe, sourceframe, mask=final_source_canvas)
                 result2 = cv2.add(source_face_masked , source_image_canvas) 
@@ -328,7 +294,7 @@ def main():
             #
             #
 
-            elif len(pastframes1) > 60 and len(pastframes1) <= 90: #EFFECT 2. later: timer less than 40s 
+            elif len(pastframes1) > 600 and len(pastframes1) <= 900: #EFFECT 2. later: timer less than 40s 
                 print("effect 2")
 
                 #for both participants, delaunay becomes time travel between their own frames. Testing with one first
@@ -501,7 +467,7 @@ def main():
             #
 
 
-            elif len(pastframes1) > 90 and len(pastframes1) <= 120: #EFFECT 3. later: timer less than 60s 
+            elif len(pastframes1) > 900 and len(pastframes1) <= 1200: #EFFECT 3. later: timer less than 60s 
                 print("effect 3")
                 resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                 resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
@@ -557,4 +523,5 @@ def main():
     cv2.destroyAllWindows()
 
 main()
+
 

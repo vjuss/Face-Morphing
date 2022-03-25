@@ -101,5 +101,3 @@ class CheckFaceLoc:
 
     def stop(self):
          self.stopped = True
-
-
