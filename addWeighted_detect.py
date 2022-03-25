@@ -68,21 +68,8 @@ def main():
         vidframe = video_capture.frame
         vidframe2 = video_capture2.frame
 
-        two_faces = video_process.twofaces #checks if true or false 
-
-        if two_faces == True:
-            #vidframe = video_capture2.frame
-            #vidframe2 = video_capture.frame
-            #FLIPPING AND EYE / MATCH DETETCTUON WILL HAPPEN IN THIS CASE
-            matchresult = video_process.match # check if faces or eyes match - make thi into a function or class
-        else:
-            #idframe = video_capture.frame
-            #vidframe2 = video_capture2.frame
-            matchresult = False
-        #
-        # 
-        #
-        #  
+        matchresult = video_process.match
+        
         if matchresult == True: 
             print("faces match")
             matchtime = time.time() - start 

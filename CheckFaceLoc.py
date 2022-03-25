@@ -53,50 +53,51 @@ class CheckFaceLoc:
             
             if len(_faces) == 1 and len(_faces2) == 1:
                 self.twofaces = True
+
+                for _face in _faces:
+                    _landmarks = _predictor(_gray, _face)
+                    self.landmarks = _landmarks
+                    _pupil_x = int((abs(_landmarks.part(39).x + _landmarks.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
+                    _pupil_y = int((abs(_landmarks.part(39).y + _landmarks.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                    _pupil_coordination = (_pupil_x, _pupil_y)
+                    self.leftpupils = _pupil_coordination
+
+                    _rpupil_x = int((abs(_landmarks.part(46).x + _landmarks.part(44).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
+                    _rpupil_y = int((abs(_landmarks.part(46).y + _landmarks.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                    _rpupil_coordination = (_rpupil_x, _rpupil_y)
+                    self.rightpupils = _rpupil_coordination
+
+
+                for _face2 in _faces2:
+                    _landmarks2 = _predictor(_gray2, _face2)
+                    self.landmarks2 = _landmarks2
+                    _pupil_x2 = int((abs(_landmarks2.part(39).x + _landmarks2.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
+                    _pupil_y2 = int((abs(_landmarks2.part(39).y + _landmarks2.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                    _pupil_coordination2 = (_pupil_x2, _pupil_y2)
+                    self.leftpupils2 = _pupil_coordination2
+
+                    _rpupil_x2 = int((abs(_landmarks2.part(46).x + _landmarks2.part(44).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
+                    _rpupil_y2 = int((abs(_landmarks2.part(46).y + _landmarks2.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                    _rpupil_coordination2 = (_rpupil_x2, _rpupil_y2)
+                    self.rightpupils2 = _rpupil_coordination2
+
+                #Are they a match?
+
+                _closenesspupilsA = math.isclose(_rpupil_x, _rpupil_x2, abs_tol =70)
+                _closenesspupilsB = math.isclose(_rpupil_y, _rpupil_y2, abs_tol =70)
+
+                if _closenesspupilsA == True and _closenesspupilsB == True:
+                    _match = True
+
+                else:
+                    _match = False
+                
+                self.match = _match
+
             else:
                 self.twofaces = False
 
             #Find face coords
-
-            for _face in _faces:
-                _landmarks = _predictor(_gray, _face)
-                self.landmarks = _landmarks
-                _pupil_x = int((abs(_landmarks.part(39).x + _landmarks.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
-                _pupil_y = int((abs(_landmarks.part(39).y + _landmarks.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
-                _pupil_coordination = (_pupil_x, _pupil_y)
-                self.leftpupils = _pupil_coordination
-
-                _rpupil_x = int((abs(_landmarks.part(46).x + _landmarks.part(44).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
-                _rpupil_y = int((abs(_landmarks.part(46).y + _landmarks.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
-                _rpupil_coordination = (_rpupil_x, _rpupil_y)
-                self.rightpupils = _rpupil_coordination
-
-
-            for _face2 in _faces2:
-                _landmarks2 = _predictor(_gray2, _face2)
-                self.landmarks2 = _landmarks2
-                _pupil_x2 = int((abs(_landmarks2.part(39).x + _landmarks2.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
-                _pupil_y2 = int((abs(_landmarks2.part(39).y + _landmarks2.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
-                _pupil_coordination2 = (_pupil_x2, _pupil_y2)
-                self.leftpupils2 = _pupil_coordination2
-
-                _rpupil_x2 = int((abs(_landmarks2.part(46).x + _landmarks2.part(44).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
-                _rpupil_y2 = int((abs(_landmarks2.part(46).y + _landmarks2.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
-                _rpupil_coordination2 = (_rpupil_x2, _rpupil_y2)
-                self.rightpupils2 = _rpupil_coordination2
-
-            #Are they a match?
-
-            _closenesspupilsA = math.isclose(_rpupil_x, _rpupil_x2, abs_tol =70)
-            _closenesspupilsB = math.isclose(_rpupil_y, _rpupil_y2, abs_tol =70)
-
-            if _closenesspupilsA == True and _closenesspupilsB == True:
-                _match = True
-
-            else:
-                _match = False
-            
-            self.match = _match
 
 
     def stop(self):
