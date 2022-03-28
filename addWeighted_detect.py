@@ -1,6 +1,4 @@
 #steps: 
-#1)when less than two faces spotted, show participants own face and don't calculate faces
-#2)when two faces, show opponents face and only then find landmarks adn draw your own pupils
 #3)when eyes mach, keep the frames like they are (you see opponent) and start to apply delaunay until 255
 #4) effet 2
 #5) effetc 3(back to opponent)
@@ -71,8 +69,6 @@ def main():
         twofaces = video_process.twofaces
 
         if twofaces == True:
-            print("do all the next steps")
-
             matchresult = video_process.match
 
             if matchresult == True: 
@@ -500,16 +496,16 @@ def main():
 
         else: # if no two faces
             print("Just show video like it is")
-            resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
-            resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+            resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+            resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
 
         # this happens in any case, we just manipulate the contents
         #
         #
 
 
-        cv2.imshow("otherview", resultframe)
-        cv2.imshow("Veerasview", resultframe2)
+        cv2.imshow("Veerasview", resultframe)
+        cv2.imshow("Otherview", resultframe2)
 
         key = cv2.waitKey(1)
         if key == 27: #esc
