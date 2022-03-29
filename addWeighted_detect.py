@@ -8,6 +8,8 @@
 
 from cgitb import handler
 from ctypes import wstring_at
+from errno import EALREADY
+from locale import currency
 import cv2
 from cv2 import FLOODFILL_FIXED_RANGE
 import numpy as np
@@ -56,7 +58,8 @@ def main():
 
     matchresult = False # placeholder when starting
     drawingeyes = False
-    start = time.time()
+    start_time = time.time() 
+    time_limit = 10
 
 
     while True:
@@ -69,25 +72,26 @@ def main():
 
         twofaces = video_process.twofaces
 
+        current_time = time.time() #keeps updating
+       
+
         if twofaces == True:
             matchresult = video_process.match
 
-            if matchresult == True: 
-                #print("faces match")
-                matchtime = time.time() - start 
-                #print(matchtime)  #this number grows every time loop is run
-                currenttime = time.time() -matchtime - start
-                #print(currenttime)
+            if matchresult == True:
+                #matchtime = time.time() - start_time
             
                 pastframes1.append(vidframe) # storing ghost images to be used later
                 pastframes2.append(vidframe2) #
+                
+                elapsed_time = current_time - start_time #starts from 14 or so, depending on when match
+                print(elapsed_time)
                 #
                 #
                 #
                 #
 
                 if len(pastframes1) <= 300: #EFFECT 1. later: timer less than 20 s
-                    print("effect 1")
                     sourceframe = video_process.frame
                     destinationframe = video_process.frame2
                     height2, width2, channels2 = sourceframe.shape
