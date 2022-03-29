@@ -41,8 +41,8 @@ def extract_index_nparray(nparray):
 
 def main():
 
-    video_capture2 = VideoGet(src=1).start()  #0 and 1 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=0).start()
+    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni
+    video_capture = VideoGet(src=2).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -55,6 +55,7 @@ def main():
     pastframes2 = list()
 
     matchresult = False # placeholder when starting
+    drawingeyes = False
     start = time.time()
 
 
@@ -72,7 +73,7 @@ def main():
             matchresult = video_process.match
 
             if matchresult == True: 
-                print("faces match")
+                #print("faces match")
                 matchtime = time.time() - start 
                 #print(matchtime)  #this number grows every time loop is run
                 currenttime = time.time() -matchtime - start
@@ -272,8 +273,8 @@ def main():
                     seamlessclone2 = cv2.seamlessClone(result2, sourceframe, final_source_face_mask, center_face_source, cv2.NORMAL_CLONE)  #EDITED
                     seamlessclone2 = cv2.cvtColor(seamlessclone2, cv2.COLOR_BGR2GRAY)
 
-                    resultframe = seamlessclone
-                    resultframe2 = seamlessclone2
+                    resultframe = seamlessclone2
+                    resultframe2 = seamlessclone
 
                 #
                 #
@@ -492,10 +493,10 @@ def main():
                     cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
 
                 else:
-                    print("not drawing eyes")
+                    drawingeyes = False
 
         else: # if no two faces
-            print("Just show video like it is")
+            drawingeyes = False
             resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
             resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
 
