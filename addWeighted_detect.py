@@ -41,6 +41,16 @@ def extract_index_nparray(nparray):
             break
         return index
 
+
+def translate(value, leftMin, leftMax, rightMin, rightMax): #https://stackoverflow.com/questions/1969240/mapping-a-range-of-values-to-another
+    leftSpan = leftMax - leftMin
+    rightSpan = rightMax - rightMin
+    # Convert the left range into a 0-1 range (float)
+    valueScaled = float(value - leftMin) / float(leftSpan)
+    # Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan)
+
+
 def main():
 
     video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni
@@ -77,22 +87,17 @@ def main():
         if twofaces == True:
             matchresult = video_process.match
 
-
             if matchresult == True:
-                #matchtime = time.time() - start_time
             
                 pastframes1.append(vidframe) # storing ghost images to be used later
                 pastframes2.append(vidframe2) #
                 
                 elapsed_time = current_time - start_time
-                print(elapsed_time)
-                #
-                #
+                #print(elapsed_time)
                 #
                 #
 
-                #if len(pastframes1) <= 300: #EFFECT 1. later: timer less than 20 s
-                if elapsed_time < 5:
+                if elapsed_time < 10:
                     sourceframe = video_process.frame
                     destinationframe = video_process.frame2
                     height2, width2, channels2 = sourceframe.shape
@@ -249,10 +254,11 @@ def main():
 
                     ## Put reconstructed face on the destination image
 
-                    opacity = len(pastframes1) * 8 #max value is 24
-
+                    opacity = translate(elapsed_time, 0, 10, 0, 255)
+                    print("map wth function", opacity)
+    
                     final_destination_canvas = np.zeros_like(destinationgray)
-                    final_destination_face_mask = cv2.fillConvexPoly(final_destination_canvas, destinationconvexhull, 155) 
+                    final_destination_face_mask = cv2.fillConvexPoly(final_destination_canvas, destinationconvexhull, opacity) 
                     final_destination_canvas = cv2.bitwise_not(final_destination_face_mask)
                     destination_face_masked = cv2.bitwise_and(destinationframe, destinationframe, mask=final_destination_canvas)
                     result = cv2.add(destination_face_masked, destination_image_canvas)
@@ -261,7 +267,7 @@ def main():
                     # Put reconstructed face on the source image
 
                     final_source_canvas = np.zeros_like(sourcegray)
-                    final_source_face_mask = cv2.fillConvexPoly(final_source_canvas, sourceconvexhull, 155) #EDITED
+                    final_source_face_mask = cv2.fillConvexPoly(final_source_canvas, sourceconvexhull, opacity) #EDITED
                     final_source_canvas = cv2.bitwise_not(final_source_face_mask)
                     source_face_masked = cv2.bitwise_and(sourceframe, sourceframe, mask=final_source_canvas)
                     result2 = cv2.add(source_face_masked , source_image_canvas) 
@@ -280,14 +286,10 @@ def main():
 
                     resultframe = seamlessclone2
                     resultframe2 = seamlessclone
-
-                #
-                #
-                #
                 #
                 #
 
-                elif elapsed_time >= 5 and elapsed_time < 10:
+                elif elapsed_time >= 10 and elapsed_time < 20:
                     print("effect 2")
 
                     #for both participants, delaunay becomes time travel between their own frames. Testing with one first
@@ -450,15 +452,10 @@ def main():
 
                     resultframe2 = seamlessclone3
                     resultframe = seamlessclone3
-
                 #
                 #
                 #
-                #
-                #
-                #
-                #
-                elif elapsed_time >= 10 and elapsed_time < 15:
+                elif elapsed_time >= 20 and elapsed_time < 30:
                     print("effect 3")
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
@@ -468,16 +465,10 @@ def main():
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
 
-
                 #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
                 #delaunay_process = AddDelaunay(frame = vidframe, frame2 = vidframe2, detector=facedetector, predictor = landmarkpredictor).start()
                 #resultframe = delaunay_process.seamlessclone
                 #resultframe2 = delaunay_process.seamlessclone2
-
-                #gray = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
-                #gray2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
-            #
-            #
             #
             #
             #
@@ -504,7 +495,6 @@ def main():
         # this happens in any case, we just manipulate the contents
         #
         #
-
 
         cv2.imshow("Veerasview", resultframe)
         cv2.imshow("Otherview", resultframe2)
