@@ -58,7 +58,6 @@ def main():
 
     matchresult = False # placeholder when starting
     drawingeyes = False
-    start_time = time.time() 
     time_limit = 10
 
 
@@ -78,20 +77,22 @@ def main():
         if twofaces == True:
             matchresult = video_process.match
 
+
             if matchresult == True:
                 #matchtime = time.time() - start_time
             
                 pastframes1.append(vidframe) # storing ghost images to be used later
                 pastframes2.append(vidframe2) #
                 
-                elapsed_time = current_time - start_time #starts from 14 or so, depending on when match
+                elapsed_time = current_time - start_time
                 print(elapsed_time)
                 #
                 #
                 #
                 #
 
-                if len(pastframes1) <= 300: #EFFECT 1. later: timer less than 20 s
+                #if len(pastframes1) <= 300: #EFFECT 1. later: timer less than 20 s
+                if elapsed_time < 5:
                     sourceframe = video_process.frame
                     destinationframe = video_process.frame2
                     height2, width2, channels2 = sourceframe.shape
@@ -286,7 +287,7 @@ def main():
                 #
                 #
 
-                elif len(pastframes1) > 600 and len(pastframes1) <= 900: #EFFECT 2. later: timer less than 40s 
+                elif elapsed_time >= 5 and elapsed_time < 10:
                     print("effect 2")
 
                     #for both participants, delaunay becomes time travel between their own frames. Testing with one first
@@ -457,9 +458,7 @@ def main():
                 #
                 #
                 #
-
-
-                elif len(pastframes1) > 900 and len(pastframes1) <= 1200: #EFFECT 3. later: timer less than 60s 
+                elif elapsed_time >= 10 and elapsed_time < 15:
                     print("effect 3")
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
@@ -477,16 +476,14 @@ def main():
 
                 #gray = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                 #gray2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
-
-
-
             #
             #
             #
             #
             #
 
-            else: # if match result not true but there are two faces, just draw eyes
+            else: # if match result not true but there are two faces, just draw eyes and update start time
+                start_time = time.time() 
                 resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                 resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
