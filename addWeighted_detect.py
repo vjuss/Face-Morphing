@@ -1,12 +1,9 @@
 #steps to do: 
 #4) effet 2
-#5) effetc 3(back to opponent)
 #6) draw nicer version of the eyes
 #7) music
 #8) test on pi or mac mini
 #9) code into classes, fucntions etc
-
-
 
 
 from cgitb import handler
@@ -54,10 +51,12 @@ def translate(value, leftMin, leftMax, rightMin, rightMax): #https://stackoverfl
     return rightMin + (valueScaled * rightSpan)
 
 
+
+
 def main():
 
-    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=0).start()
+    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni
+    video_capture = VideoGet(src=2).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -289,11 +288,21 @@ def main():
                     resultframe2 = seamlessclone
                 #
                 #
+                #
+                #
+                #
+            
 
                 elif elapsed_time >= 10 and elapsed_time < 20:
                     print("effect 2")
 
                     #for both participants, delaunay becomes time travel between their own frames. Testing with one first
+
+                    #
+                    #
+                    #
+
+
 
         
                     person1_currentframe = video_process.frame
@@ -675,6 +684,7 @@ def main():
                     cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
                     cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
                     cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
+                    cv2.polylines(resultframe2, [video_process.lefteye_start, video_process.lefteye_end], isClosed, (255, 200, 0), thickness=2, lineType=cv2.LINE_8)
 
                 else:
                     drawingeyes = False

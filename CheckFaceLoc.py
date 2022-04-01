@@ -24,6 +24,8 @@ class CheckFaceLoc:
         self.rightpupils = ()
         self.leftpupils2 = ()
         self.rightpupils2 = ()
+        self.lefteye_start = ()
+        self.lefteye_end = ()
         self.landmarks = None
 
     def start(self):
@@ -66,6 +68,9 @@ class CheckFaceLoc:
                     _rpupil_y = int((abs(_landmarks.part(46).y + _landmarks.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
                     _rpupil_coordination = (_rpupil_x, _rpupil_y)
                     self.rightpupils = _rpupil_coordination
+
+                    self.lefteye_start = (_landmarks.part(36).x, _landmarks.part(36).y)
+                    self.lefteye_end = (_landmarks.part(41).x, _landmarks.part(41).y)
 
 
                 for _face2 in _faces2:
