@@ -55,8 +55,8 @@ def translate(value, leftMin, leftMax, rightMin, rightMax): #https://stackoverfl
 
 def main():
 
-    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=2).start()
+    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
+    video_capture = VideoGet(src=0).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -684,7 +684,7 @@ def main():
                     cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
                     cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
                     cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
-                    cv2.polylines(resultframe2, [video_process.lefteye_start, video_process.lefteye_end], isClosed, (255, 200, 0), thickness=2, lineType=cv2.LINE_8)
+                    #cv2.polylines(resultframe2, [video_process.lefteye_start, video_process.lefteye_end], isClosed, (255, 200, 0), thickness=2, lineType=cv2.LINE_8)
 
                 else:
                     drawingeyes = False
