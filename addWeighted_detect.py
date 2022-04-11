@@ -301,167 +301,178 @@ def main():
                     #
                     #
                     #
+                    person1_sourceframe = random.choice(pastframes2) #old frame is the source
+                    person1_destframe = video_process.frame2 #curetn frme is the destination
+                    
+
+                    height2p, width2p, channels2p = person1_sourceframe.shape
+                    heightp, widthp, channelsp = person1_destframe.shape #was vidframe2
+
+                    sourcegray_person1 = cv2.cvtColor(person1_sourceframe, cv2.COLOR_BGR2GRAY) 
+                    destinationgray_person1 = cv2.cvtColor(person1_destframe, cv2.COLOR_BGR2GRAY) 
+
+                    sourcemaskp = np.zeros_like(sourcegray_person1)
+                    destinationmaskp = np.zeros_like(destinationgray_person1)
+
+                    source_image_canvasp = np.zeros((height2p, width2p, channels2p), np.uint8)
+                    destination_image_canvasp = np.zeros((heightp, widthp, channelsp), np.uint8)
+
+                    indexes_trianglesp = []
+
+                    #landmarks of the past face
+
+                    sourcefacesp = facedetector(person1_sourceframe)
+                    destinationfacesp = video_process.faces #current faces
 
 
 
-        
-                    person1_currentframe = video_process.frame
-                    person1_olderframe = random.choice(pastframes1)
-
-                    heightp1curr, widtp1curr, channelsp1curr = person1_currentframe.shape
-                    heightp1old, widtp1old, channelsp1old = person1_olderframe.shape
-                
-                    person1_currentframe_gray = cv2.cvtColor(person1_currentframe, cv2.COLOR_BGR2GRAY)
-                    person1_olderframe_gray = cv2.cvtColor(person1_olderframe, cv2.COLOR_BGR2GRAY)
-
-                    person1currmask = np.zeros_like(person1_currentframe_gray)
-                    person1oldmask = np.zeros_like(person1_olderframe_gray)
-
-                    person1curr_image_canvas = np.zeros((heightp1curr, widtp1curr, channelsp1curr), np.uint8)
-                    person1old_image_canvas = np.zeros((heightp1old, widtp1old, channelsp1old), np.uint8)
-
-                    indexes_triangles_person1morph = []
-
-                    person1curr_faces = video_process.faces #I'd like to apply this detecyion to consequtive frames 
-                    person1old_faces = video_process.faces #from feed 1: maybe need to do the detection using person1_currentframe_gray etc here
-
-                    for person1curr_face in person1curr_faces:
-                        sourcelandmarksp1c = video_process.landmarks
-                        sourcelandmarks_pointsp1c = []
+                    for sourcefacep in sourcefacesp:
+                        sourcelandmarksp = landmarkpredictor(sourcegray_person1, sourcefacep) #NEED TO GET PAST FSCES HERE, FIX 
+                        sourcelandmarks_pointsp = []
                         for n in range(0, 68):
-                            x = sourcelandmarksp1c.part(n).x
-                            y = sourcelandmarksp1c.part(n).y
-                            sourcelandmarks_pointsp1c.append((x, y))
+                            x = sourcelandmarksp.part(n).x
+                            y = sourcelandmarksp.part(n).y
+                            sourcelandmarks_pointsp.append((x, y))
 
-                        p1c_triangle_points = np.array(sourcelandmarks_pointsp1c, np.int32)
-                        p1cconvexhull = cv2.convexHull(p1c_triangle_points)
-                        cv2.fillConvexPoly(person1currmask, p1cconvexhull, 255)
+                        source_triangle_pointsp = np.array(sourcelandmarks_pointsp, np.int32)
+                        sourceconvexhullp = cv2.convexHull(source_triangle_pointsp)
+                        cv2.fillConvexPoly(sourcemaskp, sourceconvexhullp, 255)    
+                        
 
                         # Delaunay triangulation
 
-                        p1crect = cv2.boundingRect(p1cconvexhull)
-                        p1csubdiv = cv2.Subdiv2D(p1crect)
-                        p1csubdiv.insert(sourcelandmarks_pointsp1c)
-                        p1ctriangles = p1csubdiv.getTriangleList()
-                        p1ctriangles = np.array(p1ctriangles, dtype=np.int32)
+                        sourcerectp = cv2.boundingRect(sourceconvexhullp)
+                        sourcesubdivp = cv2.Subdiv2D(sourcerectp)
+                        sourcesubdivp.insert(sourcelandmarks_pointsp)
+                        sourcetrianglesp = sourcesubdivp.getTriangleList()
+                        sourcetrianglesp = np.array(sourcetrianglesp, dtype=np.int32)
+                        
 
-                        for t in p1ctriangles:
-                            pt1 = (t[0], t[1])
-                            pt2 = (t[2], t[3])
-                            pt3 = (t[4], t[5])
+                        for t in sourcetrianglesp:
+                            pt1p = (t[0], t[1])
+                            pt2p = (t[2], t[3])
+                            pt3p = (t[4], t[5])
 
-                            index_pt1 = np.where((p1c_triangle_points == pt1).all(axis=1))
-                            index_pt1 = extract_index_nparray(index_pt1)
+                            index_pt1p = np.where((source_triangle_pointsp == pt1p).all(axis=1))
+                            index_pt1p = extract_index_nparray(index_pt1p)
 
-                            index_pt2 = np.where((p1c_triangle_points == pt2).all(axis=1))
-                            index_pt2 = extract_index_nparray(index_pt2)
+                            index_pt2p = np.where((source_triangle_pointsp == pt2p).all(axis=1))
+                            index_pt2p = extract_index_nparray(index_pt2p)
 
-                            index_pt3 = np.where((p1c_triangle_points == pt3).all(axis=1))
-                            index_pt3 = extract_index_nparray(index_pt3)
+                            index_pt3p = np.where((source_triangle_pointsp == pt3p).all(axis=1))
+                            index_pt3p = extract_index_nparray(index_pt3p)
                             
-                            if index_pt1 is not None and index_pt2 is not None and index_pt3 is not None:
-                                p1c_triangle = [index_pt1, index_pt2, index_pt3]
-                                indexes_triangles_person1morph.append(p1c_triangle)
+                            if index_pt1p is not None and index_pt2p is not None and index_pt3p is not None:
+                                source_trianglep = [index_pt1p, index_pt2p, index_pt3p]
+                                indexes_trianglesp.append(source_trianglep)
 
-                    # Face 2
-                    for person1oldface in person1old_faces:
-                        destinationlandmarksp1o = video_process.landmarks
-                        destinationlandmarks_pointsp1o = []
+
+                    # Face 2 (current face)
+                    for destinationfacep in destinationfacesp:
+                        destinationlandmarksp = video_process.landmarks
+                        destinationlandmarks_pointsp = []
                         for n in range(0, 68):
-                            x = destinationlandmarksp1o.part(n).x
-                            y = destinationlandmarksp1o.part(n).y
-                            destinationlandmarks_pointsp1o.append((x, y))
+                            x = destinationlandmarksp.part(n).x
+                            y = destinationlandmarksp.part(n).y
+                            destinationlandmarks_pointsp.append((x, y))
 
-                        p1o_triangle_points = np.array(destinationlandmarks_pointsp1o, np.int32)
-                        p1oconvexhull = cv2.convexHull(p1o_triangle_points)
-                        cv2.fillConvexPoly(person1oldmask, p1oconvexhull, 255)  
+                        destination_triangle_pointsp = np.array(destinationlandmarks_pointsp, np.int32)
+                        destinationconvexhullp = cv2.convexHull(destination_triangle_pointsp)
+                        cv2.fillConvexPoly(destinationmaskp, destinationconvexhullp, 255)  
+
+
 
 
                     # Iterating through all source delaunay triangle and superimposing source triangles in empty destination canvas after warping to same size as destination triangles' shape
-                    for triangle_indexp1 in indexes_triangles_person1morph:
+                    for triangle_indexp in indexes_trianglesp:
 
                         # Triangulation of the first face
-                        tr1_pt1 = sourcelandmarks_pointsp1c[triangle_indexp1[0]]
-                        tr1_pt2 = sourcelandmarks_pointsp1c[triangle_indexp1[1]]
-                        tr1_pt3 = sourcelandmarks_pointsp1c[triangle_indexp1[2]]
-                        source_trianglep1 = np.array([tr1_pt1, tr1_pt2, tr1_pt3], np.int32)
+                        tr1_pt1p = sourcelandmarks_pointsp[triangle_indexp[0]]
+                        tr1_pt2p = sourcelandmarks_pointsp[triangle_indexp[1]]
+                        tr1_pt3p = sourcelandmarks_pointsp[triangle_indexp[2]]
+                        source_trianglep = np.array([tr1_pt1p, tr1_pt2p, tr1_pt3p], np.int32)
 
                         # Source rectangle
-                        source_rectanglep1 = cv2.boundingRect(source_trianglep1)
-                        (xc, yc, wc, hc) = source_rectanglep1
+                        source_rectanglep = cv2.boundingRect(source_trianglep)
+                        (xup, yup, wup, hup) = source_rectanglep
+                        cropped_source_rectanglep = person1_sourceframe[yup: yup + hup, xup: xup + wup] #even destinationframe here returns empty. tested yu and xu
+                        cropped_source_rectangle_maskp = np.zeros((hup, wup), np.uint8)
 
-                        cropped_source_rectanglep1 = person1_currentframe[yc: yc + hc, xc: xc + wc] #even destinationframe here returns empty. tested yu and xu
-                        cropped_source_rectangle_maskp1 = np.zeros((hc, wc), np.uint8)
+                        source_triangle_pointsp = np.array([[tr1_pt1p[0] - xup, tr1_pt1p[1] - yup],
+                                        [tr1_pt2p[0] - xup, tr1_pt2p[1] - yup],
+                                        [tr1_pt3p[0] - xup, tr1_pt3p[1] - yup]], np.int32) # should be xu, was x y etc beofre
 
-                        p1c_triangle_points = np.array([[tr1_pt1[0] - xc, tr1_pt1[1] - yc],
-                                        [tr1_pt2[0] - xc, tr1_pt2[1] - yc],
-                                        [tr1_pt3[0] - xc, tr1_pt3[1] - yc]], np.int32) # should be xu, was x y etc beofre
-
-                        cv2.fillConvexPoly(cropped_source_rectangle_maskp1, p1c_triangle_points, 255)
+                        cv2.fillConvexPoly(cropped_source_rectangle_maskp, source_triangle_pointsp, 255)
 
 
                         # Triangulation of second face
-                        tr2_pt1 = destinationlandmarks_pointsp1o[triangle_indexp1[0]]
-                        tr2_pt2 = destinationlandmarks_pointsp1o[triangle_indexp1[1]]
-                        tr2_pt3 = destinationlandmarks_pointsp1o[triangle_indexp1[2]]
-                        destination_trianglep1 = np.array([tr2_pt1, tr2_pt2, tr2_pt3], np.int32)
-
+                        tr2_pt1p = destinationlandmarks_pointsp[triangle_indexp[0]]
+                        tr2_pt2p = destinationlandmarks_pointsp[triangle_indexp[1]]
+                        tr2_pt3p = destinationlandmarks_pointsp[triangle_indexp[2]]
+                        destination_trianglep = np.array([tr2_pt1p, tr2_pt2p, tr2_pt3p], np.int32)
 
                         # Dest rectangle, WORKS
-                        destination_rectanglep1 = cv2.boundingRect(destination_trianglep1)
-                        (xo, yo, wo, ho) = destination_rectanglep1
+                        destination_rectanglep = cv2.boundingRect(destination_trianglep)
+                        (xp, yp, wp, hp) = destination_rectanglep
 
-                        cropped_destination_rectanglep1 = person1_olderframe[yo: yo + ho, xo: xo + wo]  #was sourceframe and worked
-                        cropped_destination_rectangle_maskp1 = np.zeros((ho, wo), np.uint8)
+                        cropped_destination_rectanglep = person1_destframe[yp: yp + hp, xp: xp + wp]  #was sourceframe and worked
+                        cropped_destination_rectangle_maskp = np.zeros((hp, wp), np.uint8)
 
-                        p1o_triangle_points = np.array([[tr2_pt1[0] - x, tr2_pt1[1] - y],
-                                            [tr2_pt2[0] - x, tr2_pt2[1] - y],
-                                            [tr2_pt3[0] - x, tr2_pt3[1] - y]], np.int32)
+                        destination_triangle_pointsp = np.array([[tr2_pt1p[0] - xp, tr2_pt1p[1] - yp],
+                                            [tr2_pt2p[0] - xp, tr2_pt2p[1] - yp],
+                                            [tr2_pt3p[0] - xp, tr2_pt3p[1] - yp]], np.int32)
 
-                        cv2.fillConvexPoly(cropped_destination_rectangle_maskp1, p1o_triangle_points, 255)
+                        cv2.fillConvexPoly(cropped_destination_rectangle_maskp, destination_triangle_pointsp, 255)
 
 
                         # Warp source triangle to match shape of destination triangle and put it over destination triangle mask
-                        p1c_triangle_points = np.float32(p1c_triangle_points)
-                        p1o_triangle_points = np.float32(p1o_triangle_points)
+                        source_triangle_pointsp = np.float32(source_triangle_pointsp)
+                        destination_triangle_pointsp = np.float32(destination_triangle_pointsp)
 
-                        matrixp1 = cv2.getAffineTransform(p1c_triangle_points, p1o_triangle_points)
+                        matrixp = cv2.getAffineTransform(source_triangle_pointsp, destination_triangle_pointsp)
+                        matrix2p = cv2.getAffineTransform(destination_triangle_pointsp, source_triangle_pointsp)
+
+                        warped_rectanglep = cv2.warpAffine(cropped_source_rectanglep, matrixp, (wp, hp))
+                        warped_trianglep = cv2.bitwise_and(warped_rectanglep, warped_rectanglep, mask=cropped_destination_rectangle_maskp)
+
+                         #warped_rectangle_2 = cv2.warpAffine(cropped_destination_rectangle, matrix2, (wu, hu)) 
+                         #warped_triangle_2 = cv2.bitwise_and(warped_rectangle_2, warped_rectangle_2, mask=cropped_source_rectangle_mask)
+
                     
-                        warped_rectanglep1 = cv2.warpAffine(cropped_source_rectanglep1 , matrixp1, (wo, ho))
-                        warped_trianglep1 = cv2.bitwise_and(warped_rectanglep1, warped_rectanglep1, mask=cropped_destination_rectangle_maskp1)
-
                         #  Reconstructing destination face in empty canvas of destination image
-                        new_dest_face_canvas_areap1 = person1old_image_canvas[yo: yo + ho, xo: xo + wo] # h y etc. are from dest rect and it works
-                        new_dest_face_canvas_areap1_gray= cv2.cvtColor(new_dest_face_canvas_areap1, cv2.COLOR_BGR2GRAY)
-
-                        _, mask_created_trianglep1 = cv2.threshold(new_dest_face_canvas_areap1_gray, 1, 255, cv2.THRESH_BINARY_INV)
-                        warped_trianglep1 = cv2.bitwise_and(warped_trianglep1, warped_trianglep1, mask=mask_created_trianglep1)
-
-                        new_dest_face_canvas_areap1 = cv2.add(new_dest_face_canvas_areap1, warped_trianglep1)
-                        person1old_image_canvas[yo: yo + ho, xo: xo + wo] = new_dest_face_canvas_areap1
                     
+                        new_dest_face_canvas_areap = destination_image_canvasp[yp: yp + hp, xp: xp + wp] # h y etc. are from dest rect and it works
+                        new_dest_face_canvas_area_grayp = cv2.cvtColor(new_dest_face_canvas_areap, cv2.COLOR_BGR2GRAY)
 
-                    ## Put reconstructed face on the destination image
+                        _, mask_created_trianglep = cv2.threshold(new_dest_face_canvas_area_grayp, 1, 255, cv2.THRESH_BINARY_INV)
+                        warped_trianglep = cv2.bitwise_and(warped_trianglep, warped_trianglep, mask=mask_created_trianglep)
 
-                    #opacity = len(pastframes1) * 8 #max value is 24
+                        new_dest_face_canvas_areap = cv2.add(new_dest_face_canvas_areap, warped_trianglep)
+                        destination_image_canvasp[yp: yp + hp, xp: xp + wp] = new_dest_face_canvas_areap
 
-                    final_destination_canvasp1 = np.zeros_like(person1_olderframe_gray)
-                    final_destination_face_maskp1 = cv2.fillConvexPoly(final_destination_canvasp1, p1oconvexhull, 155) 
-                    final_destination_canvasp1 = cv2.bitwise_not(final_destination_face_maskp1)
-                    destination_face_maskedp1 = cv2.bitwise_and(person1_olderframe, person1_olderframe, mask=final_destination_canvasp1)
-                    result3 = cv2.add(destination_face_maskedp1, person1old_image_canvas)
+
+                     ## Put reconstructed face on the destination image
+
+                    opacity = translate(elapsed_time, 10, 20, 255, 0)
+                    print("map wth function", opacity)
+    
+                    final_destination_canvasp = np.zeros_like(destinationgray_person1)
+                    final_destination_face_maskp = cv2.fillConvexPoly(final_destination_canvasp, destinationconvexhullp, 255) 
+                    final_destination_canvasp = cv2.bitwise_not(final_destination_face_maskp)
+                    destination_face_maskedp = cv2.bitwise_and(person1_destframe, person1_destframe, mask=final_destination_canvasp)
+                    result = cv2.add(destination_face_maskedp, destination_image_canvasp)
                     
 
                     # Creating seamless clone of two faces
-                    (x, y, w, h) = cv2.boundingRect(p1oconvexhull)
-                    center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
-                    (x2, y2, w2, h2) = cv2.boundingRect(p1cconvexhull)
-                    center_face_source = (int((x2 + x2 + w2) / 2), int((y2 + y2 + h2) / 2))
-                    seamlessclone3 = cv2.seamlessClone(result3, person1_olderframe, final_destination_face_maskp1, center_face2, cv2.NORMAL_CLONE)
-                    seamlessclone3 = cv2.cvtColor(seamlessclone3, cv2.COLOR_BGR2GRAY)
+                    (x, y, w, h) = cv2.boundingRect(destinationconvexhullp)
+                    center_face2p = (int((x + x + w) / 2), int((y + y + h) / 2))
 
-                    resultframe2 = seamlessclone3
-                    resultframe = seamlessclone3
+                    seamlessclone = cv2.seamlessClone(result, person1_destframe, final_destination_face_maskp, center_face2p, cv2.NORMAL_CLONE)
+                    seamlessclone = cv2.cvtColor(seamlessclone, cv2.COLOR_BGR2GRAY)
+
+                    resultframe = seamlessclone
+                    resultframe2 = seamlessclone
+    
                 #
                 #
                 #
