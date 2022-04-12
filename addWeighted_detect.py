@@ -1,9 +1,10 @@
 #steps to do: 
-#4) effet 2
+#4) effet 2: maybe still try face blending between each persons current and past? when code more simple with classes
 #6) draw nicer version of the eyes
 #8) test on pi or mac mini
 #9) code into classes, fucntions etc
 # clear old image lists when time is elapsed
+# OSC for sound
 
 
 from cgitb import handler
@@ -300,9 +301,18 @@ def main():
 
                     #add if statement here to alternate with random old frames every now and then
 
-                
-                    sourceframe = random.choice(pastframes1) 
-                    destinationframe = random.choice(pastframes2) 
+
+                    #BASIC OPTION. THIS IS JUST USING PAST FRAMES FROM BOTH AND CREATING GLITCH
+                    #sourceframe = random.choice(pastframes1) 
+                    #destinationframe = random.choice(pastframes2) 
+
+                    if int(elapsed_time) % 2 == 0: # if divisible by 3, use past
+                        sourceframe = random.choice(pastframes1) 
+                        destinationframe = random.choice(pastframes2)
+
+                    else: 
+                        sourceframe = video_process.frame
+                        destinationframe = video_process.frame2
 
                     height2, width2, channels2 = sourceframe.shape
                     height, width, channels = destinationframe.shape #was vidframe2
