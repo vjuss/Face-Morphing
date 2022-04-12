@@ -1,10 +1,10 @@
 #steps to do: 
-#4) effet 2: maybe still try face blending between each persons current and past? when code more simple with classes
-#6) draw nicer version of the eyes
-#8) test on pi or mac mini
-#9) code into classes, fucntions etc
-# clear old image lists when time is elapsed
-# OSC for sound
+#effet 2: maybe still try face blending between each persons current and past? when code more simple with classes
+#draw nicer version of the eyes
+#test on pi or mac mini
+#code into classes, fucntions etc
+#clear old image lists when time is elapsed
+#OSC for sound
 
 
 from cgitb import handler
@@ -52,8 +52,6 @@ def translate(value, leftMin, leftMax, rightMin, rightMax): #https://stackoverfl
     return rightMin + (valueScaled * rightSpan)
 
 
-
-
 def main():
 
     video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
@@ -92,6 +90,8 @@ def main():
             
                 pastframes1.append(vidframe) # storing ghost images to be used later
                 pastframes2.append(vidframe2) #
+                print(len(pastframes1))
+                print(len(pastframes2))
                 
                 elapsed_time = current_time - start_time
                 #print(elapsed_time)
@@ -700,8 +700,11 @@ def main():
 
                 else:
                     print("timer full, reset the sketch")
+                    pastframes1.clear()
+                    pastframes2.clear()
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
+
 
                 #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
                 #delaunay_process = AddDelaunay(frame = vidframe, frame2 = vidframe2, detector=facedetector, predictor = landmarkpredictor).start()
