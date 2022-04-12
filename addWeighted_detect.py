@@ -3,8 +3,8 @@
 #draw nicer version of the eyes
 #test on pi or mac mini
 #code into classes, fucntions etc
-#clear old image lists when time is elapsed
 #OSC for sound
+#full screeen or porrait mode
 
 
 from cgitb import handler
@@ -90,15 +90,22 @@ def main():
             
                 pastframes1.append(vidframe) # storing ghost images to be used later
                 pastframes2.append(vidframe2) #
-                print(len(pastframes1))
-                print(len(pastframes2))
                 
                 elapsed_time = current_time - start_time
-                #print(elapsed_time)
-                #
-                #
 
-                if elapsed_time < 10:
+                if elapsed_time < 5:
+                    print("test class")
+
+                    #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
+                    #delaunay_process = AddDelaunay(srcframe = video_process.frame, destframe = video_process.frame2, srcfaces = video_process.faces , destfaces = video_process.faces2 , srclandmarks = video_process.landmarks, destlandmarks = video_process.landmarks2, elapsedtime = elapsed_time).process()
+                    #resultframe = delaunay_process.resultframe
+                    #resultframe2 = delaunay_process.resultframe2
+
+                    resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+                    resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY)
+
+
+                elif elapsed_time >= 5 and elapsed_time < 10:
                     sourceframe = video_process.frame
                     destinationframe = video_process.frame2
                     height2, width2, channels2 = sourceframe.shape
@@ -255,7 +262,7 @@ def main():
 
                     ## Put reconstructed face on the destination image
 
-                    opacity = translate(elapsed_time, 0, 10, 0, 255)
+                    opacity = translate(elapsed_time, 5, 10, 0, 255)
                     print("map wth function", opacity)
     
                     final_destination_canvas = np.zeros_like(destinationgray)
@@ -287,6 +294,7 @@ def main():
 
                     resultframe = seamlessclone2
                     resultframe2 = seamlessclone
+              
                 #
                 #
                 #
@@ -506,9 +514,7 @@ def main():
                 #
                 elif elapsed_time >= 20 and elapsed_time < 30:
                 #
-                #
-                #
-                    print("effect 3")
+            
                     sourceframe = video_process.frame
                     destinationframe = video_process.frame2
                     height2, width2, channels2 = sourceframe.shape
@@ -705,11 +711,6 @@ def main():
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
 
-
-                #THESE 3 LINES ARE THE GOAL, NOT WORKING YET
-                #delaunay_process = AddDelaunay(frame = vidframe, frame2 = vidframe2, detector=facedetector, predictor = landmarkpredictor).start()
-                #resultframe = delaunay_process.seamlessclone
-                #resultframe2 = delaunay_process.seamlessclone2
             #
             #
             #
