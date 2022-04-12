@@ -1,9 +1,9 @@
 #steps to do: 
 #4) effet 2
 #6) draw nicer version of the eyes
-#7) music
 #8) test on pi or mac mini
 #9) code into classes, fucntions etc
+# clear old image lists when time is elapsed
 
 
 from cgitb import handler
@@ -298,8 +298,12 @@ def main():
 
                     #for both participants, delaunay becomes time travel between their own frames. Testing with one first
 
-                    sourceframe = video_process.frame
-                    destinationframe = video_process.frame2
+                    #add if statement here to alternate with random old frames every now and then
+
+                
+                    sourceframe = random.choice(pastframes1) 
+                    destinationframe = random.choice(pastframes2) 
+
                     height2, width2, channels2 = sourceframe.shape
                     height, width, channels = destinationframe.shape #was vidframe2
                     
@@ -455,10 +459,9 @@ def main():
                     ## Put reconstructed face on the destination image
 
                     opacity = translate(elapsed_time, 10, 20, 0, 255)
-                    print("map wth function", opacity)
     
                     final_destination_canvas = np.zeros_like(destinationgray)
-                    final_destination_face_mask = cv2.fillConvexPoly(final_destination_canvas, destinationconvexhull, 255) 
+                    final_destination_face_mask = cv2.fillConvexPoly(final_destination_canvas, destinationconvexhull, 155) 
                     final_destination_canvas = cv2.bitwise_not(final_destination_face_mask)
                     destination_face_masked = cv2.bitwise_and(destinationframe, destinationframe, mask=final_destination_canvas)
                     result = cv2.add(destination_face_masked, destination_image_canvas)
@@ -467,7 +470,7 @@ def main():
                     # Put reconstructed face on the source image
 
                     final_source_canvas = np.zeros_like(sourcegray)
-                    final_source_face_mask = cv2.fillConvexPoly(final_source_canvas, sourceconvexhull, 255) #EDITED
+                    final_source_face_mask = cv2.fillConvexPoly(final_source_canvas, sourceconvexhull, 155) #EDITED
                     final_source_canvas = cv2.bitwise_not(final_source_face_mask)
                     source_face_masked = cv2.bitwise_and(sourceframe, sourceframe, mask=final_source_canvas)
                     result2 = cv2.add(source_face_masked , source_image_canvas) 
@@ -486,12 +489,6 @@ def main():
 
                     resultframe = seamlessclone2
                     resultframe2 = seamlessclone
-
-                    #
-                    #
-                    #
-                    
-    
                 #
                 #
                 #
