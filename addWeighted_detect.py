@@ -254,7 +254,7 @@ def main():
     matchresult = False # placeholder when starting
     drawingeyes = False
 
-    #TESTING OSC HERE
+    #OSC BITS HERE
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="192.168.0.2",
@@ -333,7 +333,6 @@ def main():
                     cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
                     cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
                     cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
-                    #cv2.polylines(resultframe2, [video_process.lefteye_start, video_process.lefteye_end], isClosed, (255, 200, 0), thickness=2, lineType=cv2.LINE_8)
 
                 else:
                     drawingeyes = False
@@ -355,7 +354,6 @@ def main():
     video_capture.stop()
     video_capture2.stop()
     video_process.stop()
-    #delaunay_process.stop()
 
     cv2.destroyAllWindows()
 
