@@ -20,6 +20,9 @@ from CheckFaceLoc import CheckFaceLoc
 import random
 import threading
 import time
+import argparse
+from pythonosc import udp_client
+
 
 def extract_index_nparray(nparray):
         index = None
@@ -200,7 +203,6 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
     start_amount = startamount
     end_amount = endamount
     opacity = translate(elapsed_time, min_time, max_time, start_amount, end_amount) ##were 0, 10, 0, 255
-    print("map wth function", opacity)
 
     final_destination_canvas = np.zeros_like(destinationgray)
     final_destination_face_mask = cv2.fillConvexPoly(final_destination_canvas, destinationconvexhull, opacity) 
@@ -252,6 +254,18 @@ def main():
     matchresult = False # placeholder when starting
     drawingeyes = False
 
+    #TESTING OSC HERE
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip", default="192.168.0.2",
+      help="The ip of the OSC server")
+    parser.add_argument("--port", type=int, default=5005,
+      help="The port the OSC server is listening on")
+    args = parser.parse_args()
+
+    client = udp_client.SimpleUDPClient(args.ip, args.port)
+
+
     while True:
         if video_capture.stopped:
                 video_capture.stop()
@@ -269,6 +283,8 @@ def main():
             matchresult = video_process.match
 
             if matchresult == True:
+
+                client.send_message("/filter", 1) #inform max patch that connection is established
             
                 pastframes1.append(vidframe) # storing ghost images to be used later
                 pastframes2.append(vidframe2) #
@@ -300,7 +316,6 @@ def main():
                     resultframe2 = results[1]
 
                 else:
-                    print("timer full, reset the sketch")
                     pastframes1.clear()
                     pastframes2.clear()
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
@@ -308,6 +323,7 @@ def main():
             
 
             else: # if match result not true but there are two faces, just draw eyes and update start time
+                client.send_message("/filter", 0)
                 start_time = time.time() 
                 resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                 resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
@@ -323,6 +339,7 @@ def main():
                     drawingeyes = False
 
         else: # if no two faces
+            client.send_message("/filter", 0)
             drawingeyes = False
             resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
             resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
