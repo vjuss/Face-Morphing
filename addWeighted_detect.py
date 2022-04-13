@@ -15,24 +15,11 @@ from cv2 import FLOODFILL_FIXED_RANGE
 import numpy as np
 import dlib
 import math
-from AddDelaunay import AddDelaunay
 from VideoGet import VideoGet
 from CheckFaceLoc import CheckFaceLoc
-from CheckFaces import CheckFaces
 import random
 import threading
 import time
-
-def countdown():
-    global my_timer
-    my_timer = 0
-
-    for x in range(10):
-        my_timer = my_timer + 1
-        print(my_timer)
-        sleep(1)
-
-    print("10 seconds up")
 
 def extract_index_nparray(nparray):
         index = None
@@ -40,7 +27,6 @@ def extract_index_nparray(nparray):
             index = num
             break
         return index
-
 
 def translate(value, leftMin, leftMax, rightMin, rightMax): #https://stackoverflow.com/questions/1969240/mapping-a-range-of-values-to-another
     leftSpan = leftMax - leftMin
@@ -102,13 +88,13 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
             pt3 = (t[4], t[5])
 
             index_pt1 = np.where((source_triangle_points == pt1).all(axis=1))
-            index_pt1 = AddDelaunay.extract_index_nparray(index_pt1)
+            index_pt1 = extract_index_nparray(index_pt1)
 
             index_pt2 = np.where((source_triangle_points == pt2).all(axis=1))
-            index_pt2 = AddDelaunay.extract_index_nparray(index_pt2)
+            index_pt2 = extract_index_nparray(index_pt2)
 
             index_pt3 = np.where((source_triangle_points == pt3).all(axis=1))
-            index_pt3 = AddDelaunay.extract_index_nparray(index_pt3)
+            index_pt3 = extract_index_nparray(index_pt3)
             
             if index_pt1 is not None and index_pt2 is not None and index_pt3 is not None:
                 source_triangle = [index_pt1, index_pt2, index_pt3]
