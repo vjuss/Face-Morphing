@@ -1,8 +1,9 @@
 #steps to do: 
+#PERFORMANCE: NOW 270% CPU EVEN WHEN IDLE, HOW TO REDCE THAT 
+#180 % WITHOIT ANY ML -  START WITH CHECKING THREADS AND CAPTURE STUFF
 #effet 2: IF TIME maybe still try face blending between each persons current and past? when code more simple with classes
 #draw nicer version of the eyes
 #test on pi or mac mini
-#OSC for sound
 #full screeen or porrait mode
 
 
@@ -241,107 +242,105 @@ def main():
     video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
     video_capture = VideoGet(src=0).start()
 
-    facedetector = dlib.get_frontal_face_detector()
-    landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
+    # facedetector = dlib.get_frontal_face_detector()
+    # landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
     
-    video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
-    #FIX THIS SO THAT YOU ONLY USE CERATIN PROPERTIES FROM SAME VIDOE PROCESS CLASS. CREATE FUNCTIONS THERE
+    # video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
 
-    #for handling old sequences
-    pastframes1 = list()
-    pastframes2 = list()
+    # pastframes1 = list()
+    # pastframes2 = list()
 
-    matchresult = False # placeholder when starting
-    drawingeyes = False
+    # matchresult = False # placeholder when starting
+    # drawingeyes = False
 
-    #OSC BITS HERE
+    # #OSC BITS HERE
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="192.168.0.2",
-      help="The ip of the OSC server")
-    parser.add_argument("--port", type=int, default=5005,
-      help="The port the OSC server is listening on")
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--ip", default="192.168.0.2",
+    #   help="The ip of the OSC server")
+    # parser.add_argument("--port", type=int, default=5005,
+    #   help="The port the OSC server is listening on")
+    # args = parser.parse_args()
 
-    client = udp_client.SimpleUDPClient(args.ip, args.port)
+    # client = udp_client.SimpleUDPClient(args.ip, args.port)
 
 
     while True:
-        if video_capture.stopped:
-                video_capture.stop()
-                break
+        # if video_capture.stopped:
+        #         video_capture.stop()
+        #         break
 
         vidframe = video_capture.frame
         vidframe2 = video_capture2.frame
 
-        twofaces = video_process.twofaces
+        # twofaces = video_process.twofaces
 
-        current_time = time.time() #keeps updating
+        # current_time = time.time() #keeps updating
        
 
-        if twofaces == True:
-            matchresult = video_process.match
+        # if twofaces == True:
+        #     matchresult = video_process.match
 
-            if matchresult == True:
+        #     if matchresult == True:
 
-                client.send_message("/filter", 1) #inform max patch that connection is established
+        #         client.send_message("/filter", 1) #inform max patch that connection is established
             
-                pastframes1.append(vidframe) # storing ghost images to be used later
-                pastframes2.append(vidframe2) #
+        #         pastframes1.append(vidframe) # storing ghost images to be used later
+        #         pastframes2.append(vidframe2) #
                 
-                elapsed_time = current_time - start_time
+        #         elapsed_time = current_time - start_time
 
-                if elapsed_time < 10:
-                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 255)
-                    resultframe = results[0]
-                    resultframe2 = results[1]
+        #         if elapsed_time < 10:
+        #             results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 255)
+        #             resultframe = results[0]
+        #             resultframe2 = results[1]
             
-                elif elapsed_time >= 10 and elapsed_time < 20:
-                    #BASIC OPTION. THIS IS JUST USING PAST FRAMES FROM BOTH AND CREATING GLITCH
-                    if int(elapsed_time) % 2 == 0: # if divisible by 2, use past
-                        source_frame = random.choice(pastframes1) #WHEN USING PAST FRAME, FACES STILL COME FROM CURRENT FRAMES. HAS BEEN LIKE THIS WITHOUT THE CURRENT FUNCTION ALREADY 
-                        destination_frame = random.choice(pastframes2)
-                    else: 
-                        source_frame = video_process.frame
-                        destination_frame = video_process.frame2
+        #         elif elapsed_time >= 10 and elapsed_time < 20:
+        #             #BASIC OPTION. THIS IS JUST USING PAST FRAMES FROM BOTH AND CREATING GLITCH
+        #             if int(elapsed_time) % 2 == 0: # if divisible by 2, use past
+        #                 source_frame = random.choice(pastframes1) #WHEN USING PAST FRAME, FACES STILL COME FROM CURRENT FRAMES. HAS BEEN LIKE THIS WITHOUT THE CURRENT FUNCTION ALREADY 
+        #                 destination_frame = random.choice(pastframes2)
+        #             else: 
+        #                 source_frame = video_process.frame
+        #                 destination_frame = video_process.frame2
 
-                    results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 155, 155)
-                    resultframe = results[0]
-                    resultframe2 = results[1]
+        #             results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 155, 155)
+        #             resultframe = results[0]
+        #             resultframe2 = results[1]
 
-                elif elapsed_time >= 20 and elapsed_time < 30:
+        #         elif elapsed_time >= 20 and elapsed_time < 30:
 
-                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 255, 0)
-                    resultframe = results[0]
-                    resultframe2 = results[1]
+        #             results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 255, 0)
+        #             resultframe = results[0]
+        #             resultframe2 = results[1]
 
-                else:
-                    pastframes1.clear()
-                    pastframes2.clear()
-                    resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
-                    resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
+        #         else:
+        #             pastframes1.clear()
+        #             pastframes2.clear()
+        #             resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+        #             resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
             
 
-            else: # if match result not true but there are two faces, just draw eyes and update start time
-                client.send_message("/filter", 0)
-                start_time = time.time() 
-                resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
-                resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+        #     else: # if match result not true but there are two faces, just draw eyes and update start time
+        #         client.send_message("/filter", 0)
+        #         start_time = time.time() 
+        #         resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+        #         resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
-                if len(video_process.rightpupils) ==2 and len(video_process.rightpupils2) ==2:
-                    cv2.circle(resultframe2, video_process.rightpupils, 20, (0), -1) #drawing eyes to opponent's frame
-                    cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
-                    cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
-                    cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
+        #         if len(video_process.rightpupils) ==2 and len(video_process.rightpupils2) ==2:
+        #             cv2.circle(resultframe2, video_process.rightpupils, 20, (0), -1) #drawing eyes to opponent's frame
+        #             cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
+        #             cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
+        #             cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
 
-                else:
-                    drawingeyes = False
+        #         else:
+        #             drawingeyes = False
 
-        else: # if no two faces
-            client.send_message("/filter", 0)
-            drawingeyes = False
-            resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
-            resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+        # else: # if no two faces
+        #     client.send_message("/filter", 0)
+        #     drawingeyes = False
+        resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+        resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
 
         cv2.imshow("Veerasview", resultframe)
         cv2.imshow("Otherview", resultframe2)
@@ -353,7 +352,8 @@ def main():
     # Release handle to the webcam
     video_capture.stop()
     video_capture2.stop()
-    video_process.stop()
+    #video_process.stop()
+
 
     cv2.destroyAllWindows()
 
