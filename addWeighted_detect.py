@@ -239,8 +239,8 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
 
 def main():
 
-    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=0).start()
+    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni
+    video_capture = VideoGet(src=2).start()
 
     # facedetector = dlib.get_frontal_face_detector()
     # landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -266,9 +266,9 @@ def main():
 
 
     while True:
-        # if video_capture.stopped:
-        #         video_capture.stop()
-        #         break
+        if video_capture.stopped:
+                video_capture.stop()
+                break
 
         vidframe = video_capture.frame
         vidframe2 = video_capture2.frame
