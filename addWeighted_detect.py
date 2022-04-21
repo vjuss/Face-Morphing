@@ -344,6 +344,7 @@ def main():
 
         cv2.imshow("Veerasview", resultframe)
         cv2.imshow("Otherview", resultframe2)
+        cv2.waitKey(50) #new addition for CPU testing. 300 makes CPU to 60% but is too slow. 50 keeps it 115 %
 
         key = cv2.waitKey(1)
         if key == 27: #esc

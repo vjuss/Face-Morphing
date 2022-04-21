@@ -1,5 +1,8 @@
 from threading import Thread
 import cv2
+import time
+
+#edited to follow https://pyimagesearch.com/2015/12/21/increasing-webcam-fps-with-python-and-opencv/
 
 class VideoGet:
     """
@@ -13,15 +16,18 @@ class VideoGet:
         self.stopped = False
 
     def start(self):    
-        Thread(target=self.get, args=()).start()
+        Thread(target=self.update, args=()).start()
         return self
 
-    def get(self):
-        while not self.stopped:
-            if not self.grabbed:
-                self.stop()
-            else:
-                (self.grabbed, self.frame) = self.stream.read()
+    def update(self):
+
+        while True:
+            if self.stopped:
+                return
+
+            (self.grabbed, self.frame) = self.stream.read()
+            
+
 
     def read(self):
         return self.frame
