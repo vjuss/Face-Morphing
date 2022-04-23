@@ -3,6 +3,7 @@ import cv2
 import dlib
 import math
 import numpy as np
+import time
 
 #class will check a) if there are faces b) face coords of two frames c) returns a yes if they match
         
@@ -103,6 +104,7 @@ class CheckFaceLoc:
                 self.twofaces = False
 
             #Find face coords
+           # time.sleep(0.1) # new addition to reduce CPU
 
 
     def stop(self):
