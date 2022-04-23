@@ -245,6 +245,7 @@ def main():
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
     
     video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
+    #video_process= CheckFaceLoc(capture1 = video_capture.frame, capture2=video_capture2.frame, detector=facedetector, predictor=landmarkpredictor).start()
     #FIX THIS SO THAT YOU ONLY USE CERATIN PROPERTIES FROM SAME VIDOE PROCESS CLASS. CREATE FUNCTIONS THERE
 
     #for handling old sequences
@@ -295,6 +296,9 @@ def main():
                     results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 255)
                     resultframe = results[0]
                     resultframe2 = results[1]
+                    cv2.imshow("Veerasview", resultframe)
+                    cv2.imshow("Otherview", resultframe2)
+                    cv2.waitKey(100)
             
                 elif elapsed_time >= 10 and elapsed_time < 20:
                     #BASIC OPTION. THIS IS JUST USING PAST FRAMES FROM BOTH AND CREATING GLITCH
@@ -308,18 +312,27 @@ def main():
                     results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 155, 155)
                     resultframe = results[0]
                     resultframe2 = results[1]
+                    cv2.imshow("Veerasview", resultframe)
+                    cv2.imshow("Otherview", resultframe2)
+                    cv2.waitKey(100)
 
                 elif elapsed_time >= 20 and elapsed_time < 30:
 
                     results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 255, 0)
                     resultframe = results[0]
                     resultframe2 = results[1]
+                    cv2.imshow("Veerasview", resultframe)
+                    cv2.imshow("Otherview", resultframe2)
+                    cv2.waitKey(100)
 
                 else:
                     pastframes1.clear()
                     pastframes2.clear()
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
+                    cv2.imshow("Veerasview", resultframe)
+                    cv2.imshow("Otherview", resultframe2)
+                    cv2.waitKey(100)
             
 
             else: # if match result not true but there are two faces, just draw eyes and update start time
@@ -337,24 +350,31 @@ def main():
                 else:
                     drawingeyes = False
 
-        else: # if no two faces
+                cv2.imshow("Veerasview", resultframe)
+                cv2.imshow("Otherview", resultframe2)
+                cv2.waitKey(150) #update frame and draw eyes every 150ms if not match
+
+        else: # if no two faces = IDLE
+
             client.send_message("/filter", 0)
             drawingeyes = False
             resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
             resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            cv2.imshow("Veerasview", resultframe)
+            cv2.imshow("Otherview", resultframe2)
+            cv2.waitKey(3000) #update frame every 3 seconds if no-one is around. still checks faces all the time
 
-        cv2.imshow("Veerasview", resultframe)
-        cv2.imshow("Otherview", resultframe2)
 
         key = cv2.waitKey(1)
         if key == 27: #esc
-            break
+            break # escape loop
+            cv2.destroyAllWindows()
 
     # Release handle to the webcam
     video_capture.stop()
     video_capture2.stop()
     video_process.stop()
-
     cv2.destroyAllWindows()
+
 
 main()

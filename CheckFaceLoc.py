@@ -104,7 +104,9 @@ class CheckFaceLoc:
                 self.twofaces = False
 
             #Find face coords
-           # time.sleep(0.1) # new addition to reduce CPU
+            #print("faceloc checked")
+            #print(time.time())
+            cv2.waitKey(200)# wait 100 ms before checking faceloc again - new frames from this thread not available more often than 50 ms
 
 
     def stop(self):
