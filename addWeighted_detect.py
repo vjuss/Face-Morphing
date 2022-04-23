@@ -293,7 +293,7 @@ def main():
                 elapsed_time = current_time - start_time
 
                 if elapsed_time < 10:
-                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 255)
+                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 200)
                     resultframe = results[0]
                     resultframe2 = results[1]
                     cv2.imshow("Veerasview", resultframe)
@@ -309,7 +309,7 @@ def main():
                         source_frame = video_process.frame
                         destination_frame = video_process.frame2
 
-                    results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 155, 155)
+                    results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 200, 200)
                     resultframe = results[0]
                     resultframe2 = results[1]
                     cv2.imshow("Veerasview", resultframe)
@@ -318,7 +318,7 @@ def main():
 
                 elif elapsed_time >= 20 and elapsed_time < 30:
 
-                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 255, 0)
+                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 200, 0)
                     resultframe = results[0]
                     resultframe2 = results[1]
                     cv2.imshow("Veerasview", resultframe)
