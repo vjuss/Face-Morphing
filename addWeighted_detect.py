@@ -1,9 +1,9 @@
 #steps to do: 
-#effet 2: IF TIME maybe still try face blending between each persons current and past? when code more simple with classes
-#draw nicer version of the eyes
-#test on pi or mac mini
-#OSC for sound
+#effet 2: IF TIME left maybe still try face blending between each persons current and past? when code more simple with classes
 #full screeen or porrait mode
+#MONDAY: test on pi or mac mini
+#MONDAY: enhance performance more if needed, first test with nuc & mac mini
+#TUE: ADD EFFECT https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
 
 
 from cgitb import handler
@@ -236,7 +236,22 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
     return _resultframe, _resultframe2
 
 
+def rescale_frame(frame, percent):
+    width = int(frame.shape[1]*percent/100)
+    height = int(frame.shape[0]*percent/100)
+    return cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
+
+
 def main():
+
+    screen_width = 2560
+    screen_height = 1440
+
+    cv2.namedWindow("Veerasview", cv2.WINDOW_NORMAL) #makes it scalable
+    cv2.namedWindow("Otherview", cv2.WINDOW_NORMAL)
+    #cv2.resizeWindow("Veerasview", screen_width, screen_height) 
+    #cv2.resizeWindow("Otherview", screen_width,screen_height)
+
 
     video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
     video_capture = VideoGet(src=0).start()
@@ -342,10 +357,20 @@ def main():
                 resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
                 if len(video_process.rightpupils) ==2 and len(video_process.rightpupils2) ==2:
-                    cv2.circle(resultframe2, video_process.rightpupils, 20, (0), -1) #drawing eyes to opponent's frame
-                    cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
-                    cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
-                    cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
+
+                    firstlefteye_region = np.array([(video_process.landmarks.part(36).x, video_process.landmarks.part(36).y), (video_process.landmarks.part(37).x, video_process.landmarks.part(37).y), (video_process.landmarks.part(38).x, video_process.landmarks.part(38).y), (video_process.landmarks.part(39).x, video_process.landmarks.part(39).y), (video_process.landmarks.part(40).x, video_process.landmarks.part(40).y), (video_process.landmarks.part(41).x, video_process.landmarks.part(41).y)], np.int32)
+                    firstrighteye_region = np.array([(video_process.landmarks.part(42).x, video_process.landmarks.part(42).y), (video_process.landmarks.part(43).x, video_process.landmarks.part(43).y), (video_process.landmarks.part(44).x, video_process.landmarks.part(44).y), (video_process.landmarks.part(45).x, video_process.landmarks.part(45).y), (video_process.landmarks.part(46).x, video_process.landmarks.part(46).y), (video_process.landmarks.part(47).x, video_process.landmarks.part(47).y)], np.int32)
+                    secondlefteye_region = np.array([(video_process.landmarks2.part(36).x, video_process.landmarks2.part(36).y), (video_process.landmarks2.part(37).x, video_process.landmarks2.part(37).y), (video_process.landmarks2.part(38).x, video_process.landmarks2.part(38).y), (video_process.landmarks2.part(39).x, video_process.landmarks2.part(39).y), (video_process.landmarks2.part(40).x, video_process.landmarks2.part(40).y), (video_process.landmarks2.part(41).x, video_process.landmarks2.part(41).y)], np.int32)
+                    secondrighteye_region = np.array([(video_process.landmarks2.part(42).x, video_process.landmarks2.part(42).y), (video_process.landmarks2.part(43).x, video_process.landmarks2.part(43).y), (video_process.landmarks2.part(44).x, video_process.landmarks2.part(44).y), (video_process.landmarks2.part(45).x, video_process.landmarks2.part(45).y), (video_process.landmarks2.part(46).x, video_process.landmarks2.part(46).y), (video_process.landmarks2.part(47).x, video_process.landmarks2.part(47).y)], np.int32)
+                    cv2.polylines(resultframe2,[firstlefteye_region], True, (0), 2 )
+                    cv2.polylines(resultframe2,[firstrighteye_region], True, (0), 2 )
+                    cv2.polylines(resultframe,[secondlefteye_region], True, (255), 2 )
+                    cv2.polylines(resultframe,[secondrighteye_region], True, (255), 2 )
+
+                    #cv2.circle(resultframe2, video_process.rightpupils, 20, (0), -1) #drawing eyes to opponent's frame
+                    #cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
+                    #cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
+                    #cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
 
                 else:
                     drawingeyes = False
@@ -356,10 +381,12 @@ def main():
 
         else: # if no two faces = IDLE
 
-            client.send_message("/filter", 0)
+            client.send_message("/filter", 0) #inform max that connection is broken
             drawingeyes = False
             resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
             resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            #resultframe = cv2.resize(resultframe, (4000, 3000))  
+            #resultframe2 = cv2.resize(resultframe2, (4000, 3000))  
             cv2.imshow("Veerasview", resultframe)
             cv2.imshow("Otherview", resultframe2)
             cv2.waitKey(3000) #update frame every 3 seconds if no-one is around. still checks faces all the time
