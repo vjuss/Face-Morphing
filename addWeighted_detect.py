@@ -402,6 +402,8 @@ def main():
     video_capture2.stop()
     video_process.stop()
     cv2.destroyAllWindows()
+    cv2.waitKey(1)
+
 
 
 main()
