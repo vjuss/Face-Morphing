@@ -1,7 +1,7 @@
 #steps to do: 
 #effet 2: IF TIME: maybe still try face blending between each persons current and past? when code more simple with classes
 #IF TIME: full screeen or porrait mode 
-#THU: ADD EFFECT https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
+#IF TIME TRY FACE LIST EFFECT https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
 #FRIDAY: test on pi or mac mini OR work laptop
 
 
@@ -22,6 +22,25 @@ import threading
 import time
 import argparse
 from pythonosc import udp_client
+
+
+class EyeList(object):
+    def __init__(self, length):
+        self.length = length
+        self.eyes = []
+
+    def push(self, newcoords):
+        if len(self.eyes) < self.length:
+            self.eyes.append(newcoords)
+        else:
+            self.eyes.pop(0)
+            self.eyes.append(newcoords)
+    
+    def clear(self):
+        self.eyes = []
+
+facelist = EyeList(10)
+
 
 
 def extract_index_nparray(nparray):
@@ -190,6 +209,11 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
         new_source_face_canvas_area_gray = cv2.cvtColor(new_source_face_canvas_area, cv2.COLOR_BGR2GRAY)
         _, mask_created_triangle_2 = cv2.threshold(new_source_face_canvas_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
         warped_triangle_2 = cv2.bitwise_and(warped_triangle_2, warped_triangle_2, mask=mask_created_triangle_2)
+        # plainmask = cv2.bitwise_and(new_source_face_canvas_area_gray, new_source_face_canvas_area_gray, mask=mask_created_triangle_2)
+        # plainx, plainy, plainw, plainh = cv2.boundingRect(plainmask)
+        # facelist.push([plainx, plainy])
+
+    
 
         new_source_face_canvas_area = cv2.add(new_source_face_canvas_area, warped_triangle_2)
         source_image_canvas[yu: yu + hu, xu: xu + wu] = new_source_face_canvas_area
@@ -233,6 +257,8 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
 
     _resultframe = seamlessclone2
     _resultframe2 = seamlessclone
+
+
     return _resultframe, _resultframe2
 
 
