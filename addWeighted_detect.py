@@ -1,8 +1,9 @@
 #steps to do: 
-#effet 2: IF TIME: maybe still try face blending between each persons current and past? when code more simple with classes
+#FRIDAY: test on pi or mac mini OR work laptop
+#IF TIME: maybe still try face blending between each persons current and past? when code more simple with classes
 #IF TIME: full screeen or porrait mode 
 #IF TIME TRY FACE LIST EFFECT https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
-#FRIDAY: test on pi or mac mini OR work laptop
+
 
 
 
