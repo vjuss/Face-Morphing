@@ -1,9 +1,9 @@
 #steps to do: 
-#effet 2: IF TIME left maybe still try face blending between each persons current and past? when code more simple with classes
-#full screeen or porrait mode
-#MONDAY: test on pi or mac mini
-#MONDAY: enhance performance more if needed, first test with nuc & mac mini
-#TUE: ADD EFFECT https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
+#effet 2: IF TIME: maybe still try face blending between each persons current and past? when code more simple with classes
+#IF TIME: full screeen or porrait mode 
+#THU: ADD EFFECT https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
+#FRIDAY: test on pi or mac mini OR work laptop
+
 
 
 from cgitb import handler
@@ -253,8 +253,8 @@ def main():
     #cv2.resizeWindow("Otherview", screen_width,screen_height)
 
 
-    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=2).start()
+    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
+    video_capture = VideoGet(src=0).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -383,13 +383,19 @@ def main():
 
             client.send_message("/filter", 0) #inform max that connection is broken
             drawingeyes = False
-            resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
-            resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            #following two lines cause the flip between screens, now not active
+            #resultframe = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+            #resultframe2 = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            #these show the same frame in one screen all the time, whether people are present or not
+            resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
+            resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
+
             #resultframe = cv2.resize(resultframe, (4000, 3000))  
             #resultframe2 = cv2.resize(resultframe2, (4000, 3000))  
             cv2.imshow("Veerasview", resultframe)
             cv2.imshow("Otherview", resultframe2)
-            cv2.waitKey(3000) #update frame every 3 seconds if no-one is around. still checks faces all the time
+            cv2.waitKey(3000) #update frame every 3 seconds if no-one is around. still checks faces all the time. 
+            #THIS WAITKEY NUMBER MIGHT NEED TO BE SMALLER so that a glicth in face detection doesnt freeze screen for 3 secs
 
 
         key = cv2.waitKey(1)
