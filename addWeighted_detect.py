@@ -280,8 +280,8 @@ def main():
     #cv2.resizeWindow("Otherview", screen_width,screen_height)
 
 
-    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=0).start()
+    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni
+    video_capture = VideoGet(src=2).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -421,7 +421,7 @@ def main():
             #resultframe2 = cv2.resize(resultframe2, (4000, 3000))  
             cv2.imshow("Veerasview", resultframe)
             cv2.imshow("Otherview", resultframe2)
-            cv2.waitKey(3000) #update frame every 3 seconds if no-one is around. still checks faces all the time. 
+            cv2.waitKey(500) #update frame every 3 seconds if no-one is around. still checks faces all the time. 
             #THIS WAITKEY NUMBER MIGHT NEED TO BE SMALLER so that a glicth in face detection doesnt freeze screen for 3 secs
 
 
