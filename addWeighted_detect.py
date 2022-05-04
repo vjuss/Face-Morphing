@@ -280,8 +280,8 @@ def main():
     #cv2.resizeWindow("Otherview", screen_width,screen_height)
 
 
-    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni
-    video_capture = VideoGet(src=0).start()
+    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni. 0  and 1 with on own laptop at uni
+    video_capture = VideoGet(src=1).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -300,7 +300,7 @@ def main():
     #OSC BITS HERE
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="192.168.0.2",
+    parser.add_argument("--ip", default="10.19.209.78",
       help="The ip of the OSC server")
     parser.add_argument("--port", type=int, default=5005,
       help="The port the OSC server is listening on")
