@@ -274,14 +274,14 @@ def main():
     screen_width = 2560
     screen_height = 1440
 
-    cv2.namedWindow("Veerasview", cv2.WINDOW_NORMAL) #makes it scalable
-    cv2.namedWindow("Otherview", cv2.WINDOW_NORMAL)
-    #cv2.resizeWindow("Veerasview", screen_width, screen_height) 
-    #cv2.resizeWindow("Otherview", screen_width,screen_height)
+    cv2.namedWindow("Person1", cv2.WINDOW_NORMAL) #makes it scalable
+    cv2.namedWindow("Person2", cv2.WINDOW_NORMAL)
+    #cv2.resizeWindow("Person1", screen_width, screen_height) 
+    #cv2.resizeWindow("Person2", screen_width,screen_height)
 
 
-    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni. 0  and 1 with on own laptop at uni
-    video_capture = VideoGet(src=1).start()
+    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni. 0  and 1 with on own laptop at uni
+    video_capture = VideoGet(src=0).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -300,7 +300,7 @@ def main():
     #OSC BITS HERE
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="10.19.209.78",
+    parser.add_argument("--ip", default="192.168.0.2",
       help="The ip of the OSC server")
     parser.add_argument("--port", type=int, default=5005,
       help="The port the OSC server is listening on")
@@ -338,8 +338,8 @@ def main():
                     results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 200)
                     resultframe = results[0]
                     resultframe2 = results[1]
-                    cv2.imshow("Veerasview", resultframe)
-                    cv2.imshow("Otherview", resultframe2)
+                    cv2.imshow("Person1", resultframe)
+                    cv2.imshow("Person2", resultframe2)
                     cv2.waitKey(100)
             
                 elif elapsed_time >= 10 and elapsed_time < 20:
@@ -354,8 +354,8 @@ def main():
                     results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 200, 200)
                     resultframe = results[0]
                     resultframe2 = results[1]
-                    cv2.imshow("Veerasview", resultframe)
-                    cv2.imshow("Otherview", resultframe2)
+                    cv2.imshow("Person1", resultframe)
+                    cv2.imshow("Person2", resultframe2)
                     cv2.waitKey(100)
 
                 elif elapsed_time >= 20 and elapsed_time < 30:
@@ -363,17 +363,18 @@ def main():
                     results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 200, 0)
                     resultframe = results[0]
                     resultframe2 = results[1]
-                    cv2.imshow("Veerasview", resultframe)
-                    cv2.imshow("Otherview", resultframe2)
+                    cv2.imshow("Person1", resultframe)
+                    cv2.imshow("Person2", resultframe2)
                     cv2.waitKey(100)
 
                 else:
+                    client.send_message("/filter", 0)
                     pastframes1.clear()
                     pastframes2.clear()
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
-                    cv2.imshow("Veerasview", resultframe)
-                    cv2.imshow("Otherview", resultframe2)
+                    cv2.imshow("Person1", resultframe)
+                    cv2.imshow("Person2", resultframe2)
                     cv2.waitKey(100)
             
 
@@ -402,8 +403,8 @@ def main():
                 else:
                     drawingeyes = False
 
-                cv2.imshow("Veerasview", resultframe)
-                cv2.imshow("Otherview", resultframe2)
+                cv2.imshow("Person1", resultframe)
+                cv2.imshow("Person2", resultframe2)
                 cv2.waitKey(150) #update frame and draw eyes every 150ms if not match
 
         else: # if no two faces = IDLE
@@ -419,8 +420,8 @@ def main():
 
             #resultframe = cv2.resize(resultframe, (4000, 3000))  
             #resultframe2 = cv2.resize(resultframe2, (4000, 3000))  
-            cv2.imshow("Veerasview", resultframe)
-            cv2.imshow("Otherview", resultframe2)
+            cv2.imshow("Person1", resultframe)
+            cv2.imshow("Person2", resultframe2)
             cv2.waitKey(500) #update frame every 3 seconds if no-one is around. still checks faces all the time. 
             #THIS WAITKEY NUMBER MIGHT NEED TO BE SMALLER so that a glicth in face detection doesnt freeze screen for 3 secs
 
