@@ -1,9 +1,9 @@
 #steps to do: 
-#FRIDAY: test on pi or mac mini OR work laptop
 #IF TIME: maybe still try face blending between each persons current and past? when code more simple with classes
 #IF TIME: full screeen or porrait mode 
 #IF TIME TRY FACE LIST EFFECT https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
-
+#MUST DO : FRAME DELETION even before 30s mark, mirror view, make 30s process 45 s
+# background mAKE DARKER?, TEST MORPH AMOUNTS
 
 
 
