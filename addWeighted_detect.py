@@ -1,9 +1,8 @@
 #steps to do: 
 #FOR FUTURE VERSION AFTER CORSICA: maybe still try face blending between each persons current and past? when code more simple with classes
 #FOR FUTURE VERSION AFTER CORSICA: https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
-#IF TIME: full screeen or porrait mode 
-#MUST DO : FRAME DELETION even before 30s mark, mirror view, make 30s process 45 s
-# background mAKE DARKER?, TEST MORPH AMOUNTS
+#IF TIME: full screeen mode
+#MUST DO :mirror view test, TEST MORPH AMOUNTS
 
 
 
