@@ -1,7 +1,7 @@
 #steps to do: 
-#IF TIME: maybe still try face blending between each persons current and past? when code more simple with classes
+#FOR FUTURE VERSION AFTER CORSICA: maybe still try face blending between each persons current and past? when code more simple with classes
+#FOR FUTURE VERSION AFTER CORSICA: https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
 #IF TIME: full screeen or porrait mode 
-#IF TIME TRY FACE LIST EFFECT https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
 #MUST DO : FRAME DELETION even before 30s mark, mirror view, make 30s process 45 s
 # background mAKE DARKER?, TEST MORPH AMOUNTS
 
@@ -300,7 +300,7 @@ def main():
     #OSC BITS HERE
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="192.168.0.2",
+    parser.add_argument("--ip", default="192.168.0.104",
       help="The ip of the OSC server")
     parser.add_argument("--port", type=int, default=5005,
       help="The port the OSC server is listening on")
@@ -365,12 +365,12 @@ def main():
                     resultframe2 = results[1]
                     cv2.imshow("Person1", resultframe)
                     cv2.imshow("Person2", resultframe2)
+                    pastframes1.clear()
+                    pastframes2.clear()
                     cv2.waitKey(100)
 
                 else:
                     client.send_message("/filter", 0)
-                    pastframes1.clear()
-                    pastframes2.clear()
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
                     cv2.imshow("Person1", resultframe)
@@ -390,15 +390,10 @@ def main():
                     firstrighteye_region = np.array([(video_process.landmarks.part(42).x, video_process.landmarks.part(42).y), (video_process.landmarks.part(43).x, video_process.landmarks.part(43).y), (video_process.landmarks.part(44).x, video_process.landmarks.part(44).y), (video_process.landmarks.part(45).x, video_process.landmarks.part(45).y), (video_process.landmarks.part(46).x, video_process.landmarks.part(46).y), (video_process.landmarks.part(47).x, video_process.landmarks.part(47).y)], np.int32)
                     secondlefteye_region = np.array([(video_process.landmarks2.part(36).x, video_process.landmarks2.part(36).y), (video_process.landmarks2.part(37).x, video_process.landmarks2.part(37).y), (video_process.landmarks2.part(38).x, video_process.landmarks2.part(38).y), (video_process.landmarks2.part(39).x, video_process.landmarks2.part(39).y), (video_process.landmarks2.part(40).x, video_process.landmarks2.part(40).y), (video_process.landmarks2.part(41).x, video_process.landmarks2.part(41).y)], np.int32)
                     secondrighteye_region = np.array([(video_process.landmarks2.part(42).x, video_process.landmarks2.part(42).y), (video_process.landmarks2.part(43).x, video_process.landmarks2.part(43).y), (video_process.landmarks2.part(44).x, video_process.landmarks2.part(44).y), (video_process.landmarks2.part(45).x, video_process.landmarks2.part(45).y), (video_process.landmarks2.part(46).x, video_process.landmarks2.part(46).y), (video_process.landmarks2.part(47).x, video_process.landmarks2.part(47).y)], np.int32)
-                    cv2.polylines(resultframe2,[firstlefteye_region], True, (0), 2 )
-                    cv2.polylines(resultframe2,[firstrighteye_region], True, (0), 2 )
+                    cv2.polylines(resultframe2,[firstlefteye_region], True, (255), 2 )
+                    cv2.polylines(resultframe2,[firstrighteye_region], True, (255), 2 )
                     cv2.polylines(resultframe,[secondlefteye_region], True, (255), 2 )
                     cv2.polylines(resultframe,[secondrighteye_region], True, (255), 2 )
-
-                    #cv2.circle(resultframe2, video_process.rightpupils, 20, (0), -1) #drawing eyes to opponent's frame
-                    #cv2.circle(resultframe2, video_process.leftpupils, 20, (0), -1)
-                    #cv2.circle(resultframe, video_process.rightpupils2, 20, (255), -1)
-                    #cv2.circle(resultframe, video_process.leftpupils2, 20, (255), -1)
 
                 else:
                     drawingeyes = False
@@ -418,8 +413,6 @@ def main():
             resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
             resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
-            #resultframe = cv2.resize(resultframe, (4000, 3000))  
-            #resultframe2 = cv2.resize(resultframe2, (4000, 3000))  
             cv2.imshow("Person1", resultframe)
             cv2.imshow("Person2", resultframe2)
             cv2.waitKey(500) #update frame every 3 seconds if no-one is around. still checks faces all the time. 
