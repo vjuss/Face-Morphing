@@ -2,7 +2,7 @@
 #FOR FUTURE VERSION AFTER CORSICA: maybe still try face blending between each persons current and past? when code more simple with classes
 #FOR FUTURE VERSION AFTER CORSICA: https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
 #IF TIME: full screeen mode
-#MUST DO : full screen, TEST MORPH AMOUNTS, mask error
+#MUST DO : TEST MORPH AMOUNTS,
 
 
 
@@ -275,6 +275,7 @@ def main():
 
     cv2.namedWindow("Person1", cv2.WINDOW_NORMAL) #makes it scalable
     cv2.namedWindow("Person2", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Person1", 200, 200)
     #cv2.setWindowProperty("Person1", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     #cv2.setWindowProperty("Person2", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
@@ -334,7 +335,7 @@ def main():
                 elapsed_time = current_time - start_time
 
                 if elapsed_time < 10:
-                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 200)
+                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 150) #amount was 0, 200 for long
                     resultframe = results[0]
                     resultframe2 = results[1]
                     cv2.imshow("Person1", resultframe)
@@ -350,7 +351,7 @@ def main():
                         source_frame = video_process.frame
                         destination_frame = video_process.frame2
 
-                    results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 200, 200)
+                    results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 150, 150) #amount was 200, 200 for long
                     resultframe = results[0]
                     resultframe2 = results[1]
                     cv2.imshow("Person1", resultframe)
@@ -359,7 +360,7 @@ def main():
 
                 elif elapsed_time >= 20 and elapsed_time < 30:
 
-                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 200, 0)
+                    results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 150, 0) #amount was 200, 0 for long
                     resultframe = results[0]
                     resultframe2 = results[1]
                     cv2.imshow("Person1", resultframe)
@@ -396,7 +397,7 @@ def main():
 
                 else:
                     drawingeyes = False
-
+                #resultframe = cv2.resize(resultframe, 200, interpolation=cv2.INTER_NEAREST)
                 cv2.imshow("Person1", resultframe)
                 cv2.imshow("Person2", resultframe2)
                 cv2.waitKey(150) #update frame and draw eyes every 150ms if not match
