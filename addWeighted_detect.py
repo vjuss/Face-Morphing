@@ -2,7 +2,7 @@
 #FOR FUTURE VERSION AFTER CORSICA: maybe still try face blending between each persons current and past? when code more simple with classes
 #FOR FUTURE VERSION AFTER CORSICA: https://www.makeartwithpython.com/blog/building-a-snapchat-lens-effect-in-python/
 #IF TIME: full screeen mode
-#MUST DO :mirror view test, TEST MORPH AMOUNTS
+#MUST DO : full screen, TEST MORPH AMOUNTS, mask error
 
 
 
@@ -275,12 +275,12 @@ def main():
 
     cv2.namedWindow("Person1", cv2.WINDOW_NORMAL) #makes it scalable
     cv2.namedWindow("Person2", cv2.WINDOW_NORMAL)
-    #cv2.resizeWindow("Person1", screen_width, screen_height) 
-    #cv2.resizeWindow("Person2", screen_width,screen_height)
+    #cv2.setWindowProperty("Person1", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    #cv2.setWindowProperty("Person2", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 
-    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni. 0  and 1 with on own laptop at uni
-    video_capture = VideoGet(src=0).start()
+    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni. 0  and 1 with on own laptop at uni
+    video_capture = VideoGet(src=1).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
@@ -299,7 +299,7 @@ def main():
     #OSC BITS HERE
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="192.168.0.104",
+    parser.add_argument("--ip", default="192.168.0.2",
       help="The ip of the OSC server")
     parser.add_argument("--port", type=int, default=5005,
       help="The port the OSC server is listening on")
