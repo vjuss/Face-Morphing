@@ -280,8 +280,8 @@ def main():
     #cv2.setWindowProperty("Person2", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 
-    video_capture2 = VideoGet(src=0).start()  #1 and 0 at home, 0 and 2 at uni. 0  and 1 with on own laptop at uni
-    video_capture = VideoGet(src=1).start()
+    video_capture2 = VideoGet(src=1).start()  #1 and 0 at home, 0 and 2 at uni. 0  and 1 with on own laptop at uni
+    video_capture = VideoGet(src=0).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
