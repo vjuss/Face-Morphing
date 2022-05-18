@@ -15,6 +15,8 @@ from cv2 import FLOODFILL_FIXED_RANGE
 import numpy as np
 import dlib
 import math
+
+from pyparsing import null_debug_action
 from VideoGet import VideoGet
 from CheckFaceLoc import CheckFaceLoc
 import random
@@ -351,7 +353,25 @@ def main():
                         source_frame = video_process.frame
                         destination_frame = video_process.frame2
 
-                    results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 150, 150) #amount was 200, 200 for long
+
+                    #NEW STUFF FROM HERE
+
+                    gray = cv2.cvtColor(source_frame, cv2.COLOR_BGR2GRAY)
+                    gray2 = cv2.cvtColor(destination_frame, cv2.COLOR_BGR2GRAY)
+
+                    pastfaces= facedetector(gray)
+                    pastfaces2= facedetector(gray2)
+
+                    for pastface in pastfaces:
+                        pastlandmarks = landmarkpredictor(gray, pastface)
+
+                    for pastface2 in pastfaces2:
+                        pastlandmarks2 = landmarkpredictor(gray2, pastface2)
+
+                    #UNTIL HERE
+                    
+                    #OLD ONE results = makeDelaunay(source_frame, destination_frame, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 10, 20, 150, 150) #amount was 200, 200 for long
+                    results = makeDelaunay(source_frame, destination_frame, pastfaces, pastfaces2, pastlandmarks, pastlandmarks2, elapsed_time, 10, 20, 150, 150) #amount was 200, 200 for long
                     resultframe = results[0]
                     resultframe2 = results[1]
                     cv2.imshow("Person1", resultframe)
