@@ -2,7 +2,7 @@
 
 
 
-Computer vision powered art installation using face tracking and face morphing. Presented for the first time at Corsica Studios with In-grid collective on 19 May 2022.
+Computer vision powered art installation using face tracking and face morphing. Presented for the first time at Corsica Studios in London with In-grid collective on 19 May 2022.
 
 Uses OpenCV, dlib and threading to effectively locate and morph two faces - one on each webcam feed.
   <p>&nbsp;</p>
