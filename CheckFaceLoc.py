@@ -1,11 +1,12 @@
 from threading import Thread
 import cv2
-import dlib
 import math
-import numpy as np
-import time
 
-#class will check a) if there are faces b) face coords of two frames c) returns a yes if they match
+
+#this class will check 
+#a) if there are two faces (one in each video feed) 
+#b) face landmark locations from both video feeds 
+#c) if the eye (pupil) locations match
         
 class CheckFaceLoc:
 
@@ -41,7 +42,7 @@ class CheckFaceLoc:
             self.frame = _frame1
             self.frame2 = _frame2
 
-            # Make thme black and white for analysis
+            # Make them black and white for analysis
             _gray = cv2.cvtColor(_frame1, cv2.COLOR_BGR2GRAY)
             _gray2 = cv2.cvtColor(_frame2, cv2.COLOR_BGR2GRAY)
 
@@ -54,19 +55,19 @@ class CheckFaceLoc:
             self.faces = _faces
             self.faces2 = _faces2
             
-            if len(_faces) == 1 and len(_faces2) == 1:
+            if len(_faces) == 1 and len(_faces2) == 1: #If one face in each frame
                 self.twofaces = True
 
                 for _face in _faces:
                     _landmarks = _predictor(_gray, _face)
                     self.landmarks = _landmarks
-                    _pupil_x = int((abs(_landmarks.part(39).x + _landmarks.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
-                    _pupil_y = int((abs(_landmarks.part(39).y + _landmarks.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                    _pupil_x = int((abs(_landmarks.part(39).x + _landmarks.part(36).x)) / 2) # The midpoint between eye's corners in x axis
+                    _pupil_y = int((abs(_landmarks.part(39).y + _landmarks.part(36).y)) / 2) # The midpoint between eye's corners in y axis
                     _pupil_coordination = (_pupil_x, _pupil_y)
                     self.leftpupils = _pupil_coordination
 
-                    _rpupil_x = int((abs(_landmarks.part(46).x + _landmarks.part(44).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
-                    _rpupil_y = int((abs(_landmarks.part(46).y + _landmarks.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                    _rpupil_x = int((abs(_landmarks.part(46).x + _landmarks.part(44).x)) / 2) 
+                    _rpupil_y = int((abs(_landmarks.part(46).y + _landmarks.part(44).y)) / 2) 
                     _rpupil_coordination = (_rpupil_x, _rpupil_y)
                     self.rightpupils = _rpupil_coordination
 
@@ -77,13 +78,13 @@ class CheckFaceLoc:
                 for _face2 in _faces2:
                     _landmarks2 = _predictor(_gray2, _face2)
                     self.landmarks2 = _landmarks2
-                    _pupil_x2 = int((abs(_landmarks2.part(39).x + _landmarks2.part(36).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
-                    _pupil_y2 = int((abs(_landmarks2.part(39).y + _landmarks2.part(36).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                    _pupil_x2 = int((abs(_landmarks2.part(39).x + _landmarks2.part(36).x)) / 2) 
+                    _pupil_y2 = int((abs(_landmarks2.part(39).y + _landmarks2.part(36).y)) / 2)
                     _pupil_coordination2 = (_pupil_x2, _pupil_y2)
                     self.leftpupils2 = _pupil_coordination2
 
-                    _rpupil_x2 = int((abs(_landmarks2.part(46).x + _landmarks2.part(44).x)) / 2) # The midpoint of a line Segment between eye's corners in x axis
-                    _rpupil_y2 = int((abs(_landmarks2.part(46).y + _landmarks2.part(44).y)) / 2) # The midpoint of a line Segment between eye's corners in y axis
+                    _rpupil_x2 = int((abs(_landmarks2.part(46).x + _landmarks2.part(44).x)) / 2) 
+                    _rpupil_y2 = int((abs(_landmarks2.part(46).y + _landmarks2.part(44).y)) / 2) 
                     _rpupil_coordination2 = (_rpupil_x2, _rpupil_y2)
                     self.rightpupils2 = _rpupil_coordination2
 
@@ -103,10 +104,7 @@ class CheckFaceLoc:
             else:
                 self.twofaces = False
 
-            #Find face coords
-            #print("faceloc checked")
-            #print(time.time())
-            cv2.waitKey(200)# wait 100 ms before checking faceloc again - new frames from this thread not available more often than 50 ms
+            cv2.waitKey(200)# wait 200 ms before checking again
 
 
     def stop(self):
