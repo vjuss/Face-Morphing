@@ -6,8 +6,9 @@ Uses OpenCV, dlib and threading to effectively locate and morph two faces. Threa
 
 Delaunay triangulation is used to create a mask out of each face and to do the morphing. OSC messages are sent to trigger soundscape changes in MaxMSP.
 
-Presented for the first time at Corsica Studios in London with In-grid collective on 19 May 2022.
-&nbsp;  
+Presented for the first time at Corsica Studios in London with In-grid collective on 19 May 2022.  
+&nbsp; 
+
 
 **Installation and usage:**
 
