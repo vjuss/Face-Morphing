@@ -6,8 +6,7 @@ Uses OpenCV, dlib and threading to effectively locate and morph two faces. Threa
 
 Delaunay triangulation is used to create a mask out of each face and to do the morphing. OSC messages are sent to trigger soundscape changes in MaxMSP.
 
-Presented for the first time at Corsica Studios in London with In-grid collective on 19 May 2022.
-&nbsp;
+Presented for the first time at Corsica Studios in London with In-grid collective on 19 May 2022.&nbsp;  
 
 **Installation and usage:**
 
@@ -19,7 +18,7 @@ cd Face-Morphing
 pip3 install -r requirements.txt
 python3 main.py
 ```
-&nbsp;
+&nbsp;  
 **Interaction:**
 
 One person sits in front of each webcam. They see the face of the **other** person on their screen. Additionally, their **own** eyes are drawn on top of this video feed. With the drawn eyes as their guide, the two people are invited to align their eyes and form a connection. 
