@@ -1,14 +1,11 @@
 from threading import Thread
 import cv2
-import time
 
-#edited to follow https://pyimagesearch.com/2015/12/21/increasing-webcam-fps-with-python-and-opencv/
+#follows https://pyimagesearch.com/2015/12/21/increasing-webcam-fps-with-python-and-opencv/
+
+#gets frames from a VideoCapture object continuosly
 
 class VideoGet:
-    """
-    Class that continuously gets frames from a VideoCapture object
-    with a dedicated thread.
-    """
 
     def __init__(self, src=0):
         self.stream = cv2.VideoCapture(src)
@@ -20,15 +17,11 @@ class VideoGet:
         return self
 
     def update(self):
-
         while True:
             if self.stopped:
                 return
-
             (self.grabbed, self.frame) = self.stream.read()
             
-
-
     def read(self):
         return self.frame
 
