@@ -1,23 +1,18 @@
-
-from cgitb import handler
-from ctypes import wstring_at
-from errno import EALREADY
-from locale import currency
 import cv2
 from cv2 import FLOODFILL_FIXED_RANGE
 import numpy as np
 import dlib
-import math
 
 from pyparsing import null_debug_action
 from VideoGet import VideoGet
 from CheckFaceLoc import CheckFaceLoc
 import random
-import threading
 import time
 import argparse
 from pythonosc import udp_client
 
+
+#Helper function for extracting indexes
 
 def extract_index_nparray(nparray):
         index = None
@@ -26,14 +21,15 @@ def extract_index_nparray(nparray):
             break
         return index
 
+#Helper function for controlling the opacity of face masks based on time
+
 def translate(value, leftMin, leftMax, rightMin, rightMax): 
     leftSpan = leftMax - leftMin
     rightSpan = rightMax - rightMin
-    # Convert the left range into a 0-1 range (float)
     valueScaled = float(value - leftMin) / float(leftSpan)
-    # Convert the 0-1 range into a value in the right range.
     return rightMin + (valueScaled * rightSpan)
 
+#Function for delaunay triangulation and morphing of the two faces
 
 def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlandmarks, elapsedtime, mintime, maxtime, startamount, endamount):
     sourceframe = srcframe
@@ -52,11 +48,10 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
     destination_image_canvas = np.zeros((height, width, channels), np.uint8)
 
     indexes_triangles = []
-
-    #landmarks of first face
-
     sourcefaces = srcfaces
     destinationfaces = destfaces
+
+    #landmarks of first face
 
     for sourceface in sourcefaces:
         sourcelandmarks = srclandmarks
@@ -98,7 +93,7 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
                 source_triangle = [index_pt1, index_pt2, index_pt3]
                 indexes_triangles.append(source_triangle)
 
-    # Face 2
+    #landmarks of the second face
     for destinationface in destinationfaces:
         destinationlandmarks = destlandmarks
         destinationlandmarks_points = []
@@ -132,15 +127,13 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
 
         cv2.fillConvexPoly(cropped_source_rectangle_mask, source_triangle_points, 255)
 
-
-
         # Triangulation of second face
         tr2_pt1 = destinationlandmarks_points[triangle_index[0]]
         tr2_pt2 = destinationlandmarks_points[triangle_index[1]]
         tr2_pt3 = destinationlandmarks_points[triangle_index[2]]
         destination_triangle = np.array([tr2_pt1, tr2_pt2, tr2_pt3], np.int32)
 
-        
+        # Destination rectangle
         destination_rectangle = cv2.boundingRect(destination_triangle)
         (x, y, w, h) = destination_rectangle
 
@@ -154,7 +147,7 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
         cv2.fillConvexPoly(cropped_destination_rectangle_mask, destination_triangle_points, 255)
 
 
-        # Warp source triangle to match shape of destination triangle and put it over destination triangle mask
+        # Warp the source triangle to match the shape of the destination triangle and put it over the destination triangle mask
         source_triangle_points = np.float32(source_triangle_points)
         destination_triangle_points = np.float32(destination_triangle_points)
 
@@ -168,7 +161,7 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
         warped_triangle_2 = cv2.bitwise_and(warped_rectangle_2, warped_rectangle_2, mask=cropped_source_rectangle_mask)
 
     
-        #  Reconstructing destination face in empty canvas of destination image
+        # Reconstructing destination face in the empty canvas based on the destination image
     
         new_dest_face_canvas_area = destination_image_canvas[y: y + h, x: x + w]
         new_dest_face_canvas_area_gray = cv2.cvtColor(new_dest_face_canvas_area, cv2.COLOR_BGR2GRAY)
@@ -179,7 +172,7 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
         new_dest_face_canvas_area = cv2.add(new_dest_face_canvas_area, warped_triangle)
         destination_image_canvas[y: y + h, x: x + w] = new_dest_face_canvas_area
 
-        # Reconstructing source face in empty canvas of source image
+        # Reconstructing source face in the empty canvas based on the source image
         new_source_face_canvas_area = source_image_canvas[yu: yu + hu, xu: xu + wu] 
         new_source_face_canvas_area_gray = cv2.cvtColor(new_source_face_canvas_area, cv2.COLOR_BGR2GRAY)
         _, mask_created_triangle_2 = cv2.threshold(new_source_face_canvas_area_gray, 1, 255, cv2.THRESH_BINARY_INV)
@@ -190,14 +183,16 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
         source_image_canvas[yu: yu + hu, xu: xu + wu] = new_source_face_canvas_area
 
 
-    ## Put reconstructed face on the destination image
+    # Make the opacity of the mask depend on the time that has passed since the pupils became a match
 
     elapsed_time = elapsedtime
     min_time = mintime
     max_time = maxtime
     start_amount = startamount
     end_amount = endamount
-    opacity = translate(elapsed_time, min_time, max_time, start_amount, end_amount) ##were 0, 10, 0, 255
+    opacity = translate(elapsed_time, min_time, max_time, start_amount, end_amount)
+
+    # Put the reconstructed face on the destination image
 
     final_destination_canvas = np.zeros_like(destinationgray)
     final_destination_face_mask = cv2.fillConvexPoly(final_destination_canvas, destinationconvexhull, opacity) 
@@ -216,6 +211,7 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
 
 
     # Creating seamless clone of two faces
+
     (x, y, w, h) = cv2.boundingRect(destinationconvexhull)
     center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
     (x2, y2, w2, h2) = cv2.boundingRect(sourceconvexhull)
@@ -233,37 +229,31 @@ def makeDelaunay(srcframe, destframe, srcfaces, destfaces, srclandmarks, destlan
     return _resultframe, _resultframe2
 
 
-def rescale_frame(frame, percent):
-    width = int(frame.shape[1]*percent/100)
-    height = int(frame.shape[0]*percent/100)
-    return cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
-
-
 def main():
-
-
-    cv2.namedWindow("Person1", cv2.WINDOW_NORMAL) #makes it scalable
+    cv2.namedWindow("Person1", cv2.WINDOW_NORMAL) #makes the window scalable
     cv2.namedWindow("Person2", cv2.WINDOW_NORMAL)
-    #cv2.setWindowProperty("Person1", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-    #cv2.setWindowProperty("Person2", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
+    #Start the video capture threads - separating these into threads means video runs smoothly without face detection slowing it down
 
     video_capture2 = VideoGet(src=1).start() 
     video_capture = VideoGet(src=0).start()
 
     facedetector = dlib.get_frontal_face_detector()
     landmarkpredictor = dlib.shape_predictor("data/68_face_landmarks.dat")
+
+    #Start the face and landmark detection thread
     
     video_process= CheckFaceLoc(capture1 = video_capture, capture2=video_capture2, detector=facedetector, predictor=landmarkpredictor).start()
     
     #for handling old sequences
+    
     pastframes1 = list()
     pastframes2 = list()
 
     matchresult = False 
     drawingeyes = False
 
-    #OSC BITS HERE
+    #For sending OSC messages to MaxMSP
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="192.168.0.2",
@@ -271,9 +261,10 @@ def main():
     parser.add_argument("--port", type=int, default=5005,
       help="The port the OSC server is listening on")
     args = parser.parse_args()
-
     client = udp_client.SimpleUDPClient(args.ip, args.port)
 
+
+    #The main bit: detecting faces and pupil coordinates from two video feeds and morphing faces if there is an "eye contact"
 
     while True:
         if video_capture.stopped:
@@ -282,25 +273,22 @@ def main():
 
         vidframe = video_capture.frame
         vidframe2 = video_capture2.frame
-
-        twofaces = video_process.twofaces
-
-        current_time = time.time() #keeps updating
+        twofaces = video_process.twofaces 
+        current_time = time.time() 
        
 
         if twofaces == True:
-            matchresult = video_process.match
+            matchresult = video_process.match # Do pupil coordinates match?
 
             if matchresult == True:
 
-                client.send_message("/filter", 1) #inform max patch that connection is established
-            
+                client.send_message("/filter", 1) # inform the max patch that connection is established
                 pastframes1.append(vidframe) # storing ghost images to be used later
                 pastframes2.append(vidframe2) 
                 
                 elapsed_time = current_time - start_time
 
-                if elapsed_time < 10:
+                if elapsed_time < 10: #Gradually start morphing faces during the first 10 seconds
                     results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 0, 10, 0, 150) 
                     resultframe = results[0]
                     resultframe2 = results[1]
@@ -308,7 +296,8 @@ def main():
                     cv2.imshow("Person2", resultframe2)
                     cv2.waitKey(100)
             
-                elif elapsed_time >= 10 and elapsed_time < 20:
+
+                elif elapsed_time >= 10 and elapsed_time < 20: #If 10-20 seconds has passed, add glitches to visuals by using old stored frames - "ghosts"
                 
                     if int(elapsed_time) % 2 == 0: 
                         source_frame = random.choice(pastframes1) 
@@ -316,7 +305,6 @@ def main():
                     else: 
                         source_frame = video_process.frame
                         destination_frame = video_process.frame2
-
 
                     gray = cv2.cvtColor(source_frame, cv2.COLOR_BGR2GRAY)
                     gray2 = cv2.cvtColor(destination_frame, cv2.COLOR_BGR2GRAY)
@@ -337,7 +325,8 @@ def main():
                     cv2.imshow("Person2", resultframe2)
                     cv2.waitKey(100)
 
-                elif elapsed_time >= 20 and elapsed_time < 30:
+
+                elif elapsed_time >= 20 and elapsed_time < 30: #If 20-30 seconds has passed, gradually decrease face morphing so that people can slowly see their own face again
 
                     results = makeDelaunay(video_process.frame, video_process.frame2, video_process.faces, video_process.faces2, video_process.landmarks, video_process.landmarks2, elapsed_time, 20, 30, 150, 0)
                     resultframe = results[0]
@@ -348,7 +337,7 @@ def main():
                     pastframes2.clear()
                     cv2.waitKey(100)
 
-                else:
+                else: #If 30 seconds has passed, inform max patch and show regular video feeds 
                     client.send_message("/filter", 0)
                     resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
                     resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY)
@@ -357,7 +346,8 @@ def main():
                     cv2.waitKey(100)
             
 
-            else: 
+            else: #If pupils are not a match, inform max patch and show regular video feeds. 
+                #Also draw eyes so that participants can try to match their position
                 client.send_message("/filter", 0)
                 start_time = time.time() 
                 resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
@@ -383,14 +373,14 @@ def main():
 
         else: # if no two faces
 
-            client.send_message("/filter", 0) #inform max that connection is broken
+            client.send_message("/filter", 0) #inform max patch and show regular video feeds
             drawingeyes = False
             resultframe = cv2.cvtColor(vidframe, cv2.COLOR_BGR2GRAY) 
             resultframe2 = cv2.cvtColor(vidframe2, cv2.COLOR_BGR2GRAY) 
 
             cv2.imshow("Person1", resultframe)
             cv2.imshow("Person2", resultframe2)
-            cv2.waitKey(500) #update frame every 3 seconds if no-one is around. still checks faces all the time. 
+            cv2.waitKey(500) #update frame every 0.5 seconds if no two participants are around. Still checks faces all the time. 
 
         key = cv2.waitKey(1)
         if key == 27: #esc
